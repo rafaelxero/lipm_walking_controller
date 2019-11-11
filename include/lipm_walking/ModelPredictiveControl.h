@@ -35,86 +35,10 @@
 #include <lipm_walking/Contact.h>
 #include <lipm_walking/Pendulum.h>
 #include <lipm_walking/Preview.h>
-#include <lipm_walking/defs.h>
+#include <lipm_walking/utils/world.h>
 
 namespace lipm_walking
 {
-  /** Solution to a model predictive control problem.
-   *
-   */
-  struct ModelPredictiveControlSolution : Preview
-  {
-    /** Initialize a zero solution with a given initial state.
-     *
-     * \param initState Initial state.
-     *
-     */
-    ModelPredictiveControlSolution(const Eigen::VectorXd & initState);
-
-    /** Initialize solution from trajectories.
-     *
-     * \param stateTraj State trajectory.
-     *
-     * \param jerkTraj CoM jerk trajectory.
-     *
-     */
-    ModelPredictiveControlSolution(const Eigen::VectorXd & stateTraj, const Eigen::VectorXd & jerkTraj);
-
-    /** Integrate playback on reference.
-     *
-     * \param state CoM state to integrate upon.
-     *
-     * \param dt Duration.
-     *
-     */
-    void integrate(Pendulum & state, double dt);
-
-    /** Playback integration of CoM state reference.
-     *
-     * \param state CoM state to integrate upon.
-     *
-     * \param dt Duration.
-     *
-     */
-    void integratePlayback(Pendulum & state, double dt);
-
-    /** Post-playback integration of CoM state reference.
-     *
-     * \param state CoM state to integrate upon.
-     *
-     * \param dt Duration.
-     *
-     */
-    void integratePostPlayback(Pendulum & state, double dt);
-
-    /** Fill solution with zeros, except for initial state.
-     *
-     * \param initState Initial state.
-     *
-     */
-    void zeroFrom(const Eigen::VectorXd & initState);
-
-    /** Get the CoM jerk (input) trajectory.
-     *
-     */
-    const Eigen::VectorXd & jerkTraj() const
-    {
-      return jerkTraj_;
-    }
-
-    /** Get the CoM state trajectory.
-     *
-     */
-    const Eigen::VectorXd & stateTraj() const
-    {
-      return stateTraj_;
-    }
-
-  private:
-    Eigen::VectorXd jerkTraj_; /**< Stacked vector of CoM jerk trajectory */
-    Eigen::VectorXd stateTraj_; /**< Stacked vector of CoM state trajectory */
-  };
-
   /** Model predictive control problem.
    *
    * This implementation is based on "Trajectory free linear model predictive
@@ -206,6 +130,8 @@ namespace lipm_walking
      *
      * \param targetContact Contact used during double-support phases.
      *
+     * \param nextContact Contact coming after targetContact in the plan.
+     *
      */
     void contacts(Contact initContact, Contact targetContact, Contact nextContact)
     {
@@ -221,7 +147,7 @@ namespace lipm_walking
      */
     void initState(const Pendulum & pendulum)
     {
-      initState_ = Eigen::VectorXd(6);
+      initState_ = Eigen::VectorXd(STATE_SIZE);
       initState_ << 
         pendulum.com().head<2>(), 
         pendulum.comd().head<2>(),
@@ -294,11 +220,6 @@ namespace lipm_walking
       return velRef_;
     }
 
-    double zeta() const
-    {
-      return zeta_;
-    }
-
     const RefVec & zmpRef() const
     {
       return zmpRef_;
@@ -326,18 +247,18 @@ namespace lipm_walking
     Contact initContact_;
     Contact nextContact_;
     Contact targetContact_;
-    Eigen::HrepXd hreps_[4]; /**< ZMP inequality constraints (H-rep) */
     Eigen::Matrix<double, 2 * (NB_STEPS + 1), 1> velRef_;
     Eigen::Matrix<double, 2 * (NB_STEPS + 1), 1> zmpRef_;
     Eigen::Matrix<double, 2 * (NB_STEPS + 1), STATE_SIZE * (NB_STEPS + 1)> velCostMat_;
     Eigen::Matrix<double, 2, STATE_SIZE> dcmFromState_;
     Eigen::Matrix<double, 2, STATE_SIZE> zmpFromState_;
     Eigen::VectorXd initState_;
+    HrepXd hreps_[4]; /**< ZMP inequality constraints (H-rep) */
     copra::SolverFlag solver_ = copra::SolverFlag::QLD;
     double buildAndSolveTime_ = 0.; // [s]
     double solveTime_ = 0.; // [s]
     double zeta_;
-    std::shared_ptr<ModelPredictiveControlSolution> solution_ = nullptr;
+    std::shared_ptr<Preview> solution_ = nullptr;
     std::shared_ptr<copra::ControlCost> jerkCost_;
     std::shared_ptr<copra::PreviewSystem> previewSystem_;
     std::shared_ptr<copra::TrajectoryConstraint> termDCMCons_;

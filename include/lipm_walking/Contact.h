@@ -34,15 +34,12 @@
 #include <mc_rtc/logging.h>
 #include <mc_rbdyn/Robot.h>
 
-#include <lipm_walking/defs.h>
-
-namespace Eigen
-{
-  using HrepXd = std::pair<Eigen::MatrixXd, Eigen::VectorXd>;
-}
+#include <lipm_walking/utils/world.h>
 
 namespace lipm_walking
 {
+  using HrepXd = std::pair<Eigen::MatrixXd, Eigen::VectorXd>;
+
   /** Contact state: set of feet in contact.
    *
    */
@@ -60,31 +57,20 @@ namespace lipm_walking
   {
     /** Empty constructor.
      *
-     * Plücker transform is left uninitialized.
+     * Leaves the contact's Plücker transform uninitialized.
      *
      */
     Contact()
-      : refVel({0., 0., 0.}),
-        halfLength(0.),
-        halfWidth(0.),
-        surfaceName(""),
-        pose(),
-        id(0)
     {
     }
 
-    /** Constructor from Plücker transform.
+    /** Define from Plücker transform.
      *
      * \param pose Plücker transform from inertial to contact frame.
      *
      */
     Contact(const sva::PTransformd & pose)
-      : refVel({0., 0., 0.}),
-        halfLength(0.),
-        halfWidth(0.),
-        surfaceName(""),
-        pose(pose),
-        id(0)
+      : pose(pose)
     {
     }
 
@@ -120,30 +106,6 @@ namespace lipm_walking
       return pose.translation();
     }
 
-    /** Shorthand for lateral vector.
-     *
-     */
-    Eigen::Vector3d b() const
-    {
-      return lateral();
-    }
-
-    /** Shorthand for normal vector.
-     *
-     */
-    Eigen::Vector3d n() const
-    {
-      return normal();
-    }
-
-    /** Shorthand for sagittal vector.
-     *
-     */
-    Eigen::Vector3d t() const
-    {
-      return sagittal();
-    }
-
     /** Shorthand for position.
      *
      */
@@ -159,11 +121,11 @@ namespace lipm_walking
     {
       if (surfaceName == "LeftFootCenter")
       {
-        return p() - 0.015 * t() - 0.01 * b();
+        return p() - 0.015 * sagittal() - 0.01 * lateral();
       }
       else if (surfaceName == "RightFootCenter")
       {
-        return p() - 0.015 * t() + 0.01 * b();
+        return p() - 0.015 * sagittal() + 0.01 * lateral();
       }
       else
       {
@@ -209,7 +171,7 @@ namespace lipm_walking
      */
     Eigen::Vector3d vertex0() const
     {
-      return position() + halfLength * t() + halfWidth * b();
+      return position() + halfLength * sagittal() + halfWidth * lateral();
     }
 
     /** Corner vertex of the contact area.
@@ -217,7 +179,7 @@ namespace lipm_walking
      */
     Eigen::Vector3d vertex1() const
     {
-      return position() + halfLength * t() - halfWidth * b();
+      return position() + halfLength * sagittal() - halfWidth * lateral();
     }
 
     /** Corner vertex of the contact area.
@@ -225,7 +187,7 @@ namespace lipm_walking
      */
     Eigen::Vector3d vertex2() const
     {
-      return position() - halfLength * t() - halfWidth * b();
+      return position() - halfLength * sagittal() - halfWidth * lateral();
     }
 
     /** Corner vertex of the contact area.
@@ -233,7 +195,7 @@ namespace lipm_walking
      */
     Eigen::Vector3d vertex3() const
     {
-      return position() - halfLength * t() + halfWidth * b();
+      return position() - halfLength * sagittal() + halfWidth * lateral();
     }
 
     /** Minimum coordinate for vertices of the contact area.
@@ -305,7 +267,7 @@ namespace lipm_walking
     /** Halfspace representation of contact area in world frame.
      *
      */
-    Eigen::HrepXd hrep() const
+    HrepXd hrep() const
     {
       Eigen::Matrix<double, 4, 2> localHrepMat, worldHrepMat;
       Eigen::Matrix<double, 4, 1> localHrepVec, worldHrepVec;
@@ -319,14 +281,14 @@ namespace lipm_walking
         halfLength,
         halfWidth,
         halfWidth;
-      if ((normal() - world::e_z).norm() > 1e-3)
+      if ((normal() - world::vertical).norm() > 1e-3)
       {
         LOG_WARNING("Contact is not horizontal");
       }
       const sva::PTransformd & X_0_c = pose;
       worldHrepMat = localHrepMat * X_0_c.rotation().topLeftCorner<2, 2>();
       worldHrepVec = worldHrepMat * X_0_c.translation().head<2>() + localHrepVec;
-      return Eigen::HrepXd(worldHrepMat, worldHrepVec);
+      return HrepXd(worldHrepMat, worldHrepVec);
     }
 
     /** Move contact by a given magnitude in a random direction.
@@ -358,13 +320,13 @@ namespace lipm_walking
     }
 
   public:
-    Eigen::Vector3d refVel;
-    double halfLength;
-    double halfWidth;
-    mc_rtc::Configuration swingConfig;
-    std::string surfaceName;
-    sva::PTransformd pose;
-    unsigned id;
+    Eigen::Vector3d refVel = Eigen::Vector3d::Zero(); /**< Desired CoM velocity when the robot is supporting itself on this contact. */
+    double halfLength = 0.; /**< Half-length of the contact rectangle in [m]. */
+    double halfWidth = 0.; /**< Half-width of the contact rectangle in [m]. */
+    mc_rtc::Configuration swingConfig; /**< Additional configuration for swing foot trajectories that originate from this contact. */
+    std::string surfaceName = ""; /**< Name of the contact surface in robot model. */
+    sva::PTransformd pose; /**< Plücker transform of the contact in the inertial frame. */
+    unsigned id = 0; /**< Index of contact in footstep plan. */
   };
 
   /** Apply Plucker transform to contact frame.

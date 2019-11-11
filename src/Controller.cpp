@@ -48,6 +48,8 @@ namespace lipm_walking
     double comHeight = robotConfig("com")("height");
     maxCoMHeight_ = robotConfig("com")("max_height");
     minCoMHeight_ = robotConfig("com")("min_height");
+    maxTorsoPitch_ = robotConfig("torso")("max_pitch");
+    minTorsoPitch_ = robotConfig("torso")("min_pitch");
     for (const auto & p : plans)
     {
       auto plan = planConfig(p);
@@ -134,9 +136,6 @@ namespace lipm_walking
     logger.addLogEntry("controlRobot_comd", [this]() { return controlRobot().comVelocity(); });
     logger.addLogEntry("controlRobot_posW", [this]() { return controlRobot().posW(); });
     logger.addLogEntry("mpc_failures", [this]() { return nbMPCFailures_; });
-    logger.addLogEntry("mpc_weights_jerk", [this]() { return mpc_.jerkWeight; });
-    logger.addLogEntry("mpc_weights_vel", [this]() { return mpc_.velWeights; });
-    logger.addLogEntry("mpc_weights_zmp", [this]() { return mpc_.zmpWeight; });
     logger.addLogEntry("left_foot_ratio", [this]() { return leftFootRatio_; });
     logger.addLogEntry("left_foot_ratio_measured", [this]() { return measuredLeftFootRatio(); });
     logger.addLogEntry("pendulum_com", [this]() { return pendulum_.com(); });
@@ -236,7 +235,7 @@ namespace lipm_walking
         [this]() { return torsoPitch_; },
         [this](double pitch)
         {
-          pitch = clamp(pitch, MIN_CHEST_P, MAX_CHEST_P);
+          pitch = clamp(pitch, minTorsoPitch_, maxTorsoPitch_);
           defaultTorsoPitch_ = pitch;
           torsoPitch_ = pitch;
         }));

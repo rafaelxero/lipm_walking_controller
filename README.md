@@ -4,9 +4,15 @@
 
 Source code of the walking and stair climbing controller used in the experiments of [Stair Climbing Stabilization of the HRP-4 Humanoid Robot using Whole-body Admittance Control](https://hal.archives-ouvertes.fr/hal-01875387/document), as well as in an industrial demonstrator at the [Airbus Saint-Nazaire factory](https://cordis.europa.eu/project/rcn/194280/brief/en?WT.mc_id=exp).
 
+## Getting started
+
+- [Installation instructions](https://github.com/stephane-caron/lipm_walking_controller/wiki/Installation-instructions)
+- [Wiki](https://github.com/stephane-caron/lipm_walking_controller/wiki) for guides and troubleshooting
+- [API documentation](https://scaron.info/doc/lipm_walking_controller/)
+
 ## Installation
 
-Compilation has been tested on Ubuntu 14.04 (gcc/clang) with ROS Indigo and Ubuntu 16.04 (gcc) with ROS Kinetic.
+The controller has been tested on Ubuntu 14.04 (gcc/clang) with ROS Indigo and Ubuntu 16.04 (gcc) with ROS Kinetic. See the [installation instructions](https://github.com/stephane-caron/lipm_walking_controller/wiki/Installation-instructions) on the wiki.
 
 ### Dependencies
 
@@ -28,24 +34,16 @@ The following dependencies are not publicly released but available upon request 
 * [mc\_rtc\_ros](https://gite.lirmm.fr/multi-contact/mc_rtc_ros): ROS tools for mc\_rtc
 * [mc\_rtc\_ros\_data](https://gite.lirmm.fr/multi-contact/mc_rtc_ros_data): ROS environment and object descriptions for mc\_rtc
 
-### Building from source on Linux
-
-Link `lipm_walking_controller` from the source folder of your catkin workspace, then follow the standard catkin workflow:
-```sh
-catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo && catkin_make install
-```
-To avoid a ``sudo`` at ``catkin_make install`` you can change ownership or permissions of the ``/usr/local/lib/mc_controller`` folder.
-
 ## Usage
 
-Launch RViz for the HRP-4 model by:
+Launch RViz for the JVRC-1 model by:
 ```sh
-roslaunch lipm_walking_controller display.launch robot:=hrp4
+roslaunch lipm_walking_controller display.launch robot:=jvrc1
 ```
 Enable the controller in your mc\_rtc configuration:
 ```sh
 {
-  "MainRobot": "HRP4",
+  "MainRobot": "JVRC1",
   "Enabled": ["LIPMWalking"]
 }
 ```
@@ -53,8 +51,8 @@ Finally, start the controller from your mc\_rtc interface. Here is the example
 of a local [Choreonoid](https://choreonoid.org/en/) simulation using the
 [mc\_udp](https://gite.lirmm.fr/multi-contact/mc_udp) interface:
 ```sh
-cd /usr/local/share/hrpsys/samples/HRP4LIRMM
-choreonoid --start-simulation HRP4LIRMM_udp.cnoid  # in one terminal
+cd /usr/local/share/hrpsys/samples/JVRC1
+choreonoid --start-simulation sim_mc_udp.cnoid  # in one terminal
 MCUDPControl -h localhost  # in another terminal
 ```
 You should end up with the following windows:

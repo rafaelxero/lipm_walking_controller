@@ -6,11 +6,21 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Configuration for the [JVRC-1](https://github.com/jvrc/model/) robot model
+- Doxygen [API documentation](https://scaron.info/doc/lipm_walking_controller/)
+- ModelPredictiveControl: log ZMP and CoM velocity references
 - Stabilizer: alternative DCM gain tuning by pole placement under ZMP lag model
+
+### Fixed
+
+- Handle corner case where the DSP duration is zero
 
 ### Changed
 
+- Contact: removed ``t()``, ``b()`` and ``n()`` shorthands
 - Moved torso pitch setting to "torso" dictionary of robot config
+- Moved world definitions to ``utils/world.h``
+- Renamed ModelPredictiveControlSolution to Preview
 - Switch license to BSD 2-clause for compatibility with other mc\_rtc projects
 - Updated dependencies
 

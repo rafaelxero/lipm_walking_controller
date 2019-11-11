@@ -30,7 +30,6 @@
 #include <mc_tasks/CoMTask.h>
 
 #include <lipm_walking/Contact.h>
-#include <lipm_walking/defs.h>
 
 namespace lipm_walking
 {
@@ -63,8 +62,6 @@ namespace lipm_walking
      *
      * \param dt Integration step.
      *
-     * \param floor Frame attached to the contact plane the CoP belongs to.
-     *
      */
     void integrateCoMJerk(const Eigen::Vector3d & comddd, double dt);
 
@@ -83,7 +80,7 @@ namespace lipm_walking
      *
      * \param com New CoM position.
      *
-     * \param com New CoM velocity.
+     * \param comd New CoM velocity.
      *
      * \param comdd Initial CoM acceleration.
      *
@@ -94,7 +91,7 @@ namespace lipm_walking
      *
      * \param height CoM height above contact plane.
      *
-     * \param floor Contact plane.
+     * \param contact Contact plane.
      *
      */
     void resetCoMHeight(double height, const Contact & contact);

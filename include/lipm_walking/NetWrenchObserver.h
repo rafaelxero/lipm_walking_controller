@@ -31,7 +31,6 @@
 
 #include <lipm_walking/Pendulum.h>
 #include <lipm_walking/Contact.h>
-#include <lipm_walking/defs.h>
 
 namespace lipm_walking
 {
@@ -54,6 +53,8 @@ namespace lipm_walking
 
     /** Update estimates based on the sensed net contact wrench.
      *
+     * \param robot Robot state.
+     * 
      * \param contact Support contact frame.
      *
      */

@@ -37,13 +37,15 @@ namespace lipm_walking
 {
   namespace states
   {
-    /** Standing phase.
+    /** Enable stabilizer and keep CoM at a reference position.
      *
      * Applies a simple CoM set-point task:
      *
-     *    comdd = stiffness * (comTarget - com) - damping * comd
+     * \f[
+     *   \ddot{c} = K (c^d - c) - B \dot{c}
+     * \f]
      *
-     * with critical damping = 2 * sqrt(stiffness).
+     * with critical damping \f$B = 2 \sqrt{K}\f$.
      *
      */
     struct Standing : State
@@ -123,16 +125,14 @@ namespace lipm_walking
       void startWalking();
 
     private:
-      Contact leftFootContact_;
-      Contact rightFootContact_;
-      Eigen::Vector3d copTarget_;
-      bool goToZeroStep_;
-      bool isMakingFootContact_;
-      bool startWalking_;
-      double freeFootGain_;
-      double leftFootRatio_;
-      double releaseHeight_;
-      unsigned nbDistribFail_;
+      Contact leftFootContact_; /**< Current left foot contact handle in plan */
+      Contact rightFootContact_; /**< Current right foot contact handle in plan */
+      Eigen::Vector3d copTarget_; /**< CoP target computed from GUI input */
+      bool isMakingFootContact_; /**< Is the robot going back to double support? */
+      bool startWalking_; /**< Has the user clicked on "Start walking"? */
+      double freeFootGain_; /**< Foot task gain when lifting one foot in the air */
+      double leftFootRatio_; /**< Left foot ratio from GUI input */
+      double releaseHeight_; /**< Desired height when lifting one foot in the air */
     };
   }
 }
