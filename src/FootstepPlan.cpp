@@ -109,7 +109,7 @@ void FootstepPlan::complete(const Sole & sole)
     }
     if(contact.surfaceName.length() < 1)
     {
-      LOG_ERROR("Footstep plan has no surface name for contact " << i);
+      mc_rtc::log::error("Footstep plan has no surface name for contact {}", i);
     }
   }
 }
@@ -193,8 +193,8 @@ void FootstepPlan::updateInitialTransform(const sva::PTransformd & X_0_lf,
   }
   else
   {
-    LOG_ERROR("Invalid footstep plan: initial surfaces are \"" << contacts_[0].surfaceName << "\" and \""
-                                                               << contacts_[1].surfaceName << "\"");
+    mc_rtc::log::error("Invalid footstep plan: initial surfaces are \"{}\" and \"{}\"", contacts_[0].surfaceName,
+                       contacts_[1].surfaceName);
   }
   sva::PTransformd X_0_rise = Eigen::Vector3d{0., 0., initHeight};
   for(unsigned i = 0; i < contacts_.size(); i++)

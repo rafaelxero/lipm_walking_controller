@@ -388,7 +388,7 @@ void Stabilizer::setContact(std::shared_ptr<mc_tasks::force::CoPTask> footTask, 
   }
   else
   {
-    LOG_ERROR("Unknown foot surface: " << footTask->surface());
+    mc_rtc::log::error("Unknown foot surface: {}");
   }
 }
 
@@ -660,7 +660,7 @@ void Stabilizer::distributeWrench(const sva::ForceVecd & desiredWrench)
   bool solutionFound = qpSolver_.solve(Q, c, A_eq, b_eq, A_ineq, b_ineq, /* isDecomp = */ false);
   if(!solutionFound)
   {
-    LOG_ERROR("DS force distribution QP: solver found no solution");
+    mc_rtc::log::error("DS force distribution QP: solver found no solution");
     return;
   }
 
@@ -715,7 +715,7 @@ void Stabilizer::saturateWrench(const sva::ForceVecd & desiredWrench,
   bool solutionFound = qpSolver_.solve(Q, c, A_eq, b_eq, A_ineq, b_ineq, /* isDecomp = */ true);
   if(!solutionFound)
   {
-    LOG_ERROR("SS force distribution QP: solver found no solution");
+    mc_rtc::log::error("SS force distribution QP: solver found no solution");
     return;
   }
 

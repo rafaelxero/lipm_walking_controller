@@ -96,12 +96,12 @@ inline double clamp(double v, double vMin, double vMax, const char * label)
 {
   if(v > vMax)
   {
-    LOG_WARNING(label << " clamped to " << vMax);
+    mc_rtc::log::warning("{} clamped to {}", label, vMax);
     return vMax;
   }
   else if(v < vMin)
   {
-    LOG_WARNING(label << " clamped to " << vMin);
+    mc_rtc::log::warning("{} clamped to {}", label, vMin);
     return vMin;
   }
   else
@@ -125,12 +125,12 @@ inline void clampInPlace(double & v, double vMin, double vMax, const char * labe
 {
   if(v > vMax)
   {
-    LOG_WARNING(label << " clamped to " << vMax);
+    mc_rtc::log::warning("{} clamped to {}", label, vMax);
     v = vMax;
   }
   else if(v < vMin)
   {
-    LOG_WARNING(label << " clamped to " << vMin);
+    mc_rtc::log::warning("{} clamped to {}", label, vMin);
     v = vMin;
   }
 }

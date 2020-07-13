@@ -176,7 +176,7 @@ void states::DoubleSupport::updatePreview()
   }
   else
   {
-    LOG_WARNING("No capture trajectory, resuming walking");
+    mc_rtc::log::warning("No capture trajectory, resuming walking");
     stopDuringThisDSP_ = false;
   }
 }

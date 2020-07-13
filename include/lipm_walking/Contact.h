@@ -130,7 +130,7 @@ struct Contact
     }
     else
     {
-      LOG_ERROR("Cannot compute anklePos for surface " << surfaceName);
+      mc_rtc::log::error("Cannot compute anklePos for surface {}", surfaceName);
       return p();
     }
   }
@@ -288,7 +288,7 @@ struct Contact
     // clang-format on
     if((normal() - world::vertical).norm() > 1e-3)
     {
-      LOG_WARNING("Contact is not horizontal");
+      mc_rtc::log::warning("Contact is not horizontal");
     }
     const sva::PTransformd & X_0_c = pose;
     worldHrepMat = localHrepMat * X_0_c.rotation().topLeftCorner<2, 2>();

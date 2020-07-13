@@ -358,7 +358,7 @@ bool ModelPredictiveControl::buildAndSolve()
   }
   else
   {
-    LOG_ERROR("Model predictive control problem has no solution");
+    mc_rtc::log::error("Model predictive control problem has no solution");
     solution_.reset(new Preview());
   }
 

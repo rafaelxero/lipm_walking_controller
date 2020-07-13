@@ -63,7 +63,7 @@ void states::Standing::start()
   }
   else
   {
-    LOG_ERROR_AND_THROW(std::invalid_argument, "Unknown surface name: " << supportContact.surfaceName);
+    mc_rtc::log::error_and_throw<std::invalid_argument>("Unknown surface name: {}", supportContact.surfaceName);
   }
 
   if(ctl.isLastDSP())
@@ -246,7 +246,7 @@ void states::Standing::updateTarget(double leftFootRatio)
   auto & sole = controller().sole();
   if(controller().stabilizer().contactState() != ContactState::DoubleSupport)
   {
-    LOG_ERROR("Cannot update CoM target while in single support");
+    mc_rtc::log::error("Cannot update CoM target while in single support");
     return;
   }
   leftFootRatio = clamp(leftFootRatio, 0., 1., "Standing target");
@@ -261,7 +261,7 @@ void states::Standing::makeFootContact(std::shared_ptr<mc_tasks::force::CoPTask>
   auto & stabilizer = controller().stabilizer();
   if(footTask->admittance().couple().x() > 1e-10 || stabilizer.detectTouchdown(footTask, contact))
   {
-    LOG_WARNING("Foot is already in contact");
+    mc_rtc::log::warning("Foot is already in contact");
     return;
   }
   stabilizer.setSwingFoot(footTask);
@@ -287,12 +287,12 @@ bool states::Standing::releaseFootContact(std::shared_ptr<mc_tasks::force::CoPTa
   auto & stabilizer = controller().stabilizer();
   if(footTask->admittance().couple().x() < 1e-10)
   {
-    LOG_WARNING("Foot contact is already released");
+    mc_rtc::log::warning("Foot contact is already released");
     return false;
   }
   else if(footTask->measuredWrench().force().z() > MAX_FOOT_RELEASE_FORCE)
   {
-    LOG_ERROR("Contact force is too high to release foot");
+    mc_rtc::log::error("Contact force is too high to release foot");
     return false;
   }
   sva::PTransformd X_0_f = footTask->surfacePose();
@@ -349,7 +349,7 @@ void states::Standing::startWalking()
   auto & ctl = controller();
   if(ctl.isLastSSP())
   {
-    LOG_ERROR("No footstep in contact plan");
+    mc_rtc::log::error("No footstep in contact plan");
     return;
   }
   startWalking_ = true;

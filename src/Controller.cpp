@@ -138,7 +138,7 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
     stabilizer_.addGUIElements(gui_);
   }
 
-  LOG_SUCCESS("LIPMWalking controller init done " << this)
+  mc_rtc::log::success("LIPMWalking controller init done.");
 }
 
 void Controller::addLogEntries(mc_rtc::Logger & logger)
@@ -293,12 +293,12 @@ void Controller::addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui)
   gui->addElement({"Walking", "Main"},
                   Button("# EMERGENCY STOP",
                          [this]() {
-                           LOG_ERROR("EMERGENCY STOP!");
+                           mc_rtc::log::error("EMERGENCY STOP!");
                            emergencyStop = true;
                            this->interrupt();
                          }),
                   Button("Reset", [this]() {
-                    LOG_WARNING("Reset to Initial state");
+                    mc_rtc::log::warning("Reset to Initial state");
                     this->resume("Initial");
                   }));
 
@@ -402,7 +402,7 @@ void Controller::leftFootRatio(double ratio)
   double maxRatioVar = 1.5 * timeStep / plan.doubleSupportDuration();
   if(std::abs(ratio - leftFootRatio_) > maxRatioVar)
   {
-    LOG_WARNING("Left foot ratio jumped from " << leftFootRatio_ << " to " << ratio);
+    mc_rtc::log::warning("Left foot ratio jumped from {} to {}", leftFootRatio_, ratio);
     leftFootRatioJumped_ = true;
   }
   leftFootRatio_ = clamp(ratio, 0., 1., "leftFootRatio");
@@ -451,21 +451,21 @@ void Controller::pauseWalkingCallback(bool verbose)
   constexpr double MAX_HEIGHT_DIFF = 0.02; // [m]
   if(pauseWalking)
   {
-    LOG_WARNING("Already pausing, how did you get there?");
+    mc_rtc::log::warning("Already pausing, how did you get there?");
     return;
   }
   else if(std::abs(supportContact().z() - targetContact().z()) > MAX_HEIGHT_DIFF)
   {
     if(!pauseWalkingRequested || verbose)
     {
-      LOG_WARNING("Cannot pause on uneven ground, will pause later");
+      mc_rtc::log::warning("Cannot pause on uneven ground, will pause later");
     }
     gui()->removeElement({"Walking", "Main"}, "Pause walking");
     pauseWalkingRequested = true;
   }
   else if(pauseWalkingRequested)
   {
-    LOG_WARNING("Pausing now that contacts are at same level");
+    mc_rtc::log::warning("Pausing now that contacts are at same level");
     pauseWalkingRequested = false;
     pauseWalking = true;
   }
@@ -486,7 +486,7 @@ void Controller::warnIfRobotIsInTheAir()
   {
     if(!isInTheAir)
     {
-      LOG_WARNING("Robot is in the air");
+      mc_rtc::log::warning("Robot is in the air");
       isInTheAir = true;
     }
   }
@@ -494,7 +494,7 @@ void Controller::warnIfRobotIsInTheAir()
   {
     if(isInTheAir)
     {
-      LOG_INFO("Robot is on the ground again");
+      mc_rtc::log::info("Robot is on the ground again");
       isInTheAir = false;
     }
   }
@@ -545,7 +545,7 @@ void Controller::loadFootstepPlan(std::string name)
   torsoPitch_ = (plan.hasTorsoPitch()) ? plan.torsoPitch() : defaultTorsoPitch_;
   if(loadingNewPlan)
   {
-    LOG_INFO("Loaded footstep plan \"" << name << "\"");
+    mc_rtc::log::info("Loaded footstep plan \"{}\"", name);
   }
 }
 

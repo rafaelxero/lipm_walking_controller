@@ -54,7 +54,7 @@ Preview::Preview(const Eigen::VectorXd & stateTraj, const Eigen::VectorXd & inpu
 {
   if(stateTraj.size() / STATE_SIZE != 1 + inputTraj.size() / INPUT_SIZE)
   {
-    LOG_ERROR("Invalid state/input sizes, respectively " << stateTraj.size() << " and " << inputTraj.size());
+    mc_rtc::log::error("Invalid state/input sizes, respectively {} and {}", stateTraj.size(), inputTraj.size());
   }
   stateTraj_ = stateTraj;
   inputTraj_ = inputTraj;
@@ -93,7 +93,7 @@ void Preview::integratePostPlayback(Pendulum & pendulum, double dt)
   Eigen::Vector2d comdd_f = lastState.segment<2>(4);
   if(std::abs(comd_f.x() * comdd_f.y() - comd_f.y() * comdd_f.x()) > 1e-4)
   {
-    LOG_WARNING("MPC terminal condition is not properly fulfilled");
+    mc_rtc::log::warning("MPC terminal condition is not properly fulfilled");
   }
   double omega_f = -comd_f.dot(comdd_f) / comd_f.dot(comd_f);
   double lambda_f = std::pow(omega_f, 2);

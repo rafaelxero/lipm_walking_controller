@@ -171,7 +171,7 @@ void PlanInterpolator::configure(const mc_rtc::Configuration & plans)
   {
     if(!plans_.has(name))
     {
-      LOG_ERROR("[PlanInterpolator] Configuration lacks \"" << name << "\" plan, skipping...");
+      mc_rtc::log::error("[PlanInterpolator] Configuration lacks \"{}\" plan, skipping...", name);
       continue;
     }
     customPlan_ = plans_(name);
@@ -179,12 +179,12 @@ void PlanInterpolator::configure(const mc_rtc::Configuration & plans)
     const Contact & rightFoot = customPlan_.contacts()[0];
     if(leftFoot.surfaceName != "LeftFootCenter" || rightFoot.surfaceName != "RightFootCenter")
     {
-      LOG_ERROR("Wrong initial foothold order in \"" << name << "\" plan");
+      mc_rtc::log::error("Wrong initial foothold order in \"{}\" plan", name);
     }
     sva::PTransformd X_0_mid = sva::interpolate(leftFoot.pose, rightFoot.pose, 0.5);
     if(!X_0_mid.rotation().isIdentity() || X_0_mid.translation().norm() > 1e-4)
     {
-      LOG_ERROR("Invalid X_0_mid(\"" << name << "\") = " << X_0_mid);
+      mc_rtc::log::error("Invalid X_0_mid(\"{}\") = {}", name, X_0_mid);
     }
   }
 
@@ -345,22 +345,22 @@ void PlanInterpolator::runWalking_()
   {
     if(nbFootsteps_ - 3 != nbInnerSteps)
     {
-      LOG_ERROR("[PlanInterpolator] Footstep count check failed");
+      mc_rtc::log::error("[PlanInterpolator] Footstep count check failed");
     }
     if(std::abs(2 * outerStepLength + nbInnerSteps * innerStepLength - totalLength) > 1e-4)
     {
-      LOG_ERROR("[PlanInterpolator] Total length check failed");
+      mc_rtc::log::error("[PlanInterpolator] Total length check failed");
     }
   }
   else // (nbInnerSteps == 0)
   {
     if(nbFootsteps_ != 2)
     {
-      LOG_ERROR("[PlanInterpolator] Footstep count check failed");
+      mc_rtc::log::error("[PlanInterpolator] Footstep count check failed");
     }
     if(std::abs(outerStepLength - totalLength) > 1e-4)
     {
-      LOG_ERROR("[PlanInterpolator] Total length check failed");
+      mc_rtc::log::error("[PlanInterpolator] Total length check failed");
     }
   }
 }
