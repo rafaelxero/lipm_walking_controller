@@ -849,11 +849,8 @@ constraints:
   #  applies to main robot
   - type: kinematics
     damper: [0.1, 0.01, 0.5]
-    robotIndex: 0
 collisions:
   - type: collision
-    r1Index: 0
-    r2Index: 0
     useMinimal: true
 contacts: []
 robots:
