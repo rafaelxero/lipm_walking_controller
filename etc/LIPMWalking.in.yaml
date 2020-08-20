@@ -879,5 +879,7 @@ transitions:
   - [SingleSupport, DoubleSupport, DoubleSupport]
 
 # Set realRobot's joint configuration from encoder readings
-RunObservers: [Encoder]
-UpdateObservers: [Encoder]
+ObserverPipelines:
+  name: "EncoderPipeline"
+  observers:
+    - type: Encoder
