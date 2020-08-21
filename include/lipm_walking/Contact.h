@@ -28,8 +28,8 @@
 #pragma once
 
 #include <mc_rbdyn/Robot.h>
-#include <mc_rbdyn/constants.h>
 #include <mc_rtc/Configuration.h>
+#include <mc_rtc/constants.h>
 #include <mc_rtc/logging.h>
 #include <mc_tasks/lipm_stabilizer/Contact.h>
 
@@ -279,7 +279,7 @@ struct Contact
       halfWidth,
       halfWidth;
     // clang-format on
-    if((normal() - mc_rbdyn::constants::vertical).norm() > 1e-3)
+    if((normal() - mc_rtc::constants::vertical).norm() > 1e-3)
     {
       mc_rtc::log::warning("Contact is not horizontal");
     }

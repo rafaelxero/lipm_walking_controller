@@ -28,7 +28,7 @@
 #pragma once
 
 #include <mc_planning/Pendulum.h>
-#include <mc_rbdyn/constants.h>
+#include <mc_rtc/constants.h>
 #include <mc_rtc/gui.h>
 #include <mc_rtc/log/Logger.h>
 
@@ -119,7 +119,7 @@ struct ModelPredictiveControl
    */
   void comHeight(double height)
   {
-    double zeta = height / mc_rbdyn::constants::GRAVITY;
+    double zeta = height / mc_rtc::constants::GRAVITY;
     double omegaInv = std::sqrt(zeta);
     // clang-format off
     dcmFromState_ <<

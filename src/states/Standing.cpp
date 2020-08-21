@@ -27,7 +27,7 @@
 
 #include "Standing.h"
 
-#include <mc_rbdyn/constants.h>
+#include <mc_rtc/constants.h>
 
 #include <lipm_walking/utils/clamp.h>
 
@@ -61,7 +61,7 @@ void states::Standing::start()
   }
   else
   {
-    LOG_ERROR_AND_THROW(std::invalid_argument, "Unknown surface name: " << supportContact.surfaceName);
+    mc_rtc::log::error_and_throw<std::invalid_argument>("Unknown surface name: {}", supportContact.surfaceName);
   }
 
   if(ctl.isLastDSP())
@@ -160,8 +160,8 @@ void states::Standing::runState()
   double D = 2 * std::sqrt(K);
   Eigen::Vector3d comdd = K * (comTarget - com_i) - D * comd_i;
   Eigen::Vector3d n = ctl.supportContact().normal();
-  double lambda = n.dot(comdd + mc_rbdyn::constants::gravity) / n.dot(com_i - cop_f);
-  Eigen::Vector3d zmp = com_i - (mc_rbdyn::constants::gravity + comdd) / lambda;
+  double lambda = n.dot(comdd + mc_rtc::constants::gravity) / n.dot(com_i - cop_f);
+  Eigen::Vector3d zmp = com_i - (mc_rtc::constants::gravity + comdd) / lambda;
 
   pendulum.integrateIPM(zmp, lambda, ctl.timeStep);
   ctl.leftFootRatio(leftFootRatio_);
@@ -194,7 +194,7 @@ void states::Standing::updateTarget(double leftFootRatio)
   auto & sole = controller().sole();
   if(!controller().stabilizer()->inDoubleSupport())
   {
-    LOG_ERROR("Cannot update CoM target while in single support");
+    mc_rtc::log::error("Cannot update CoM target while in single support");
     return;
   }
   leftFootRatio = clamp(leftFootRatio, 0., 1., "Standing target");

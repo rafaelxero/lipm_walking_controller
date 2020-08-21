@@ -25,8 +25,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mc_rbdyn/constants.h>
 #include <mc_rbdyn/rpy_utils.h>
+#include <mc_rtc/constants.h>
 
 #include <lipm_walking/Controller.h>
 #include <lipm_walking/utils/clamp.h>
@@ -139,6 +139,12 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
     mpc_.addGUIElements(gui_);
     stabilizer_.addGUIElements(*gui_);
   }
+
+  // Update observers
+  datastore().make_call("KinematicAnchorFrame::" + robot().name(), [this](const mc_rbdyn::Robot & robot) {
+    return sva::interpolate(robot.surfacePose("RightFootCenter"), robot.surfacePose("LeftFootCenter"), leftFootRatio_);
+  });
+
   mc_rtc::log::success("LIPMWalking controller init done.");
 }
 
@@ -293,7 +299,7 @@ void Controller::internalReset()
   // Pendulum::reset() function. This should probably be ready from config
   // or use the robot height above ground instead.
   constexpr double DEFAULT_HEIGHT = 0.8; // [m]
-  double lambda = mc_rbdyn::constants::GRAVITY / DEFAULT_HEIGHT;
+  double lambda = mc_rtc::constants::GRAVITY / DEFAULT_HEIGHT;
   pendulum_.reset(lambda, controlRobot().com());
 
   stopLogSegment();
@@ -312,12 +318,6 @@ void Controller::leftFootRatio(double ratio)
 
 bool Controller::run()
 {
-  // Update observers
-  anchorFrame(
-      sva::interpolate(robot().surfacePose("RightFootCenter"), robot().surfacePose("LeftFootCenter"), leftFootRatio_));
-  anchorFrameReal(sva::interpolate(realRobot().surfacePose("RightFootCenter"),
-                                   realRobot().surfacePose("LeftFootCenter"), leftFootRatio_));
-
   if(emergencyStop)
   {
     return false;
