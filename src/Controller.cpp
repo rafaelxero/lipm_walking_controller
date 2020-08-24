@@ -88,13 +88,6 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   mpcConfig_ = config("mpc");
   mpc_.sole(sole_);
 
-  // Read footstep plans from configuration
-  planInterpolator.configure(planConfig);
-  planInterpolator.stepWidth(stepWidth);
-  std::string initialPlan = planInterpolator.availablePlans()[0];
-  config("initial_plan", initialPlan);
-  loadFootstepPlan(initialPlan);
-
   // ====================
   // Create Stabilizer
   // - Default configuration from the robot module
@@ -108,7 +101,8 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   //    }
   // ====================
   mc_rtc::log::info("Loading default stabilizer configuration");
-  auto stabiConf = robot().module().defaultLIPMStabilizerConfiguration();
+  auto & stabiConf = defaultStabilizerConfig_;
+  stabiConf = robot().module().defaultLIPMStabilizerConfiguration();
   stabilizer_.reset(new mc_tasks::lipm_stabilizer::StabilizerTask(
       solver().robots(), solver().realRobots(), robot().robotIndex(), stabiConf.leftFootSurface,
       stabiConf.rightFootSurface, stabiConf.torsoBodyName, solver().dt()));
@@ -121,6 +115,13 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
     }
   }
   stabilizer_->configure(stabiConf);
+
+  // Read footstep plans from configuration
+  planInterpolator.configure(planConfig);
+  planInterpolator.stepWidth(stepWidth);
+  std::string initialPlan = planInterpolator.availablePlans()[0];
+  config("initial_plan", initialPlan);
+  loadFootstepPlan(initialPlan);
 
   // =========================
   // Create Swing foot tasks
@@ -423,6 +424,10 @@ void Controller::loadFootstepPlan(std::string name)
   planInterpolator.worldReference(plan.initPose());
   planInterpolator.updateSupportPath(X_0_lf, X_0_rf);
   plan.rewind();
+
+  double torsoPitch = plan.hasTorsoPitch() ? plan.torsoPitch() : defaultStabilizerConfig_.torsoPitch;
+  stabilizer_->torsoPitch(torsoPitch);
+
   if(loadingNewPlan)
   {
     mc_rtc::log::info("Loaded footstep plan \"{}\"", name);

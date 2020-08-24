@@ -313,6 +313,8 @@ public: /* visible to FSM states */
 
 private: /* hidden from FSM states */
   std::shared_ptr<mc_tasks::lipm_stabilizer::StabilizerTask> stabilizer_;
+  mc_rbdyn::lipm_stabilizer::StabilizerConfiguration
+      defaultStabilizerConfig_; /**< Default configuration of the stabilizer */
   ModelPredictiveControl mpc_; /**< MPC problem solver used for walking pattern generation */
   mc_rtc::Configuration mpcConfig_; /**< Configuration dictionary for the walking pattern generator */
   mc_planning::Pendulum
