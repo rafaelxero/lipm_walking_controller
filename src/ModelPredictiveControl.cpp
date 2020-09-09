@@ -72,7 +72,7 @@ ModelPredictiveControl::ModelPredictiveControl()
   Eigen::VectorXd biasVector = Eigen::VectorXd::Zero(STATE_SIZE);
   initState_ = Eigen::VectorXd::Zero(STATE_SIZE);
   previewSystem_ = std::make_shared<copra::PreviewSystem>(stateMatrix, inputMatrix, biasVector, initState_, NB_STEPS);
-  LOG_SUCCESS("Initialized new ModelPredictiveControl solver");
+  mc_rtc::log::success("Initialized new ModelPredictiveControl solver");
 }
 
 void ModelPredictiveControl::configure(const mc_rtc::Configuration & config)

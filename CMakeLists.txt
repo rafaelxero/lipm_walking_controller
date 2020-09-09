@@ -42,4 +42,12 @@ find_package(copra REQUIRED)
 find_package(mc_rtc REQUIRED)
 find_package(eigen-quadprog REQUIRED)
 
+if(EXISTS "${MC_RTC_LIBDIR}/mc_controller/etc/LIPMWalking.conf")
+  message(FATAL_ERROR "\n \
+############################################################ \n \
+   Please uninstall the previous version (make uninstall)    \n \
+############################################################ \n \
+")
+endif()
+
 add_subdirectory(src)
