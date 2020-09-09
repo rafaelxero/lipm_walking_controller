@@ -855,8 +855,7 @@ collisions:
 contacts: []
 robots:
   ground:
-    module: env
-    params: ["@AROBASE@MC_ENV_DESCRIPTION@AROBASE@", ground]
+    module: env/ground
 
 #
 # Finite state machine
@@ -865,7 +864,6 @@ StatesFiles: []
 StatesLibraries: ["@MC_CONTROLLER_INSTALL_PREFIX@/lipm_walking_controller/states"]
 Managed: false
 StepByStep: false
-configs: {}
 init: Initial
 states: {}
 transitions:
