@@ -344,6 +344,9 @@ void Controller::addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui)
                               }),
                   NumberInput("Final DSP duration [s]", [this]() { return plan.finalDSPDuration(); },
                               [this](double duration) { plan.finalDSPDuration(duration); }));
+  gui->addElement({"Stabilizer", "Advanced"},
+                  ArrayInput("CoM Bias", [this]() -> const Eigen::Vector3d & { return comBias_; },
+                             [this](const Eigen::Vector3d & bias) { comBias_ = bias; }));
 }
 
 void Controller::reset(const mc_control::ControllerResetData & data)
@@ -436,7 +439,8 @@ bool Controller::run()
   torsoTask->orientation(mc_rbdyn::rpyToMat({0, torsoPitch_, 0}) * pelvisOrientation_);
 
   netWrenchObs_.update(realRobot(), supportContact());
-  stabilizer_.updateState(realCom_, realComd_, netWrenchObs_.wrench(), leftFootRatio_);
+  Eigen::Vector3d realCoMWithBias = realCom_ + realRobot().posW().rotation().transpose() * comBias_;
+  stabilizer_.updateState(realCoMWithBias, realComd_, netWrenchObs_.wrench(), leftFootRatio_);
 
   bool ret = mc_control::fsm::Controller::run();
   if(mc_control::fsm::Controller::running())
