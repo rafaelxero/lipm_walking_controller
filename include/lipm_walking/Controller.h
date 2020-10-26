@@ -329,6 +329,7 @@ private: /* hidden from FSM states */
   Pendulum pendulum_; /**< Holds the reference state (CoM position, velocity, ZMP, ...) from the walking pattern */
   Sole sole_; /**< Sole dimensions of the robot model */
   Stabilizer stabilizer_; /**< Balance feedback control component that updates task targets */
+  Eigen::Vector3d comBias_ = Eigen::Vector3d::Zero(); /**< Bias offset on the CoM measurement */
   bool leftFootRatioJumped_ = false; /**< Flag used to avoid discontinuous CoM velocity updates */
   double ctlTime_ = 0.; /**< Controller time */
   double defaultTorsoPitch_ = 0.; /**< Default torso pitch angle, in [rad] */
