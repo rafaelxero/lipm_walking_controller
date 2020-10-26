@@ -70,9 +70,9 @@ struct Stabilizer
   static constexpr double MAX_DFZ_DAMPING =
       10.; /**< Maximum normalized damping in [Hz] for foot force difference control */
   static constexpr double MAX_FDC_RX_VEL =
-      0.2; /**< Maximum x-axis angular velocity in [rad] / [s] for foot damping control. */
+      0.8; /**< Maximum x-axis angular velocity in [rad] / [s] for foot damping control. */
   static constexpr double MAX_FDC_RY_VEL =
-      0.2; /**< Maximum y-axis angular velocity in [rad] / [s] for foot damping control. */
+      0.8; /**< Maximum y-axis angular velocity in [rad] / [s] for foot damping control. */
   static constexpr double MAX_FDC_RZ_VEL =
       0.2; /**< Maximum z-axis angular velocity in [rad] / [s] for foot damping control. */
   static constexpr double MAX_ZMPCC_COM_OFFSET = 0.05; /**< Maximum CoM offset due to admittance control in [m] */
