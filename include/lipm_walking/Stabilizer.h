@@ -95,7 +95,7 @@ struct Stabilizer
    * \param gui GUI handle.
    *
    */
-  void addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui);
+  void addGUIElements(mc_rtc::gui::StateBuilder & gui);
 
   /** Log stabilizer entries.
    *
@@ -383,6 +383,9 @@ private:
     return {{copAdmittance_.y(), copAdmittance_.x(), 0.}, {0., 0., 0.}};
   }
 
+  /** Updates the support area boundaries (used for plotting) */
+  void updateSupportBoundaries();
+
 public:
   Contact leftFootContact; /**< Current left foot contact */
   Contact rightFootContact; /**< Current right foot contact */
@@ -445,6 +448,11 @@ private:
   sva::MotionVecd contactDamping_ = sva::MotionVecd::Zero(); /**< Derivative gain of contact IK task */
   sva::MotionVecd contactStiffness_ = sva::MotionVecd::Zero(); /**< Proportional gain of contact IK task */
   sva::PTransformd zmpFrame_ = sva::PTransformd::Identity(); /**< Frame in which the ZMP is taken */
+
+  double t_ = 0; /**< Elapsed time since the start of the task (for plots) */
+  Eigen::Vector2d supportMin_ = Eigen::Vector2d::Zero(); /**< Mininum boundary of the support area (for plots) */
+  Eigen::Vector2d supportMax_ = Eigen::Vector2d::Zero(); /**< Maximum boundary of the support area (for plots) */
+  Eigen::Vector3d measuredDCM_ = Eigen::Vector3d::Zero(); /**< Measured position of the DCM (for plots) */
 };
 
 } // namespace lipm_walking
