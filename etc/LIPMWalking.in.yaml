@@ -93,7 +93,7 @@ robot_models:
   hrp5_p:
     admittance:
       com: [0.0, 0.0]
-      cop: [0.001, 0.001]
+      cop: [0.008, 0.008]
       dfz: 0.0001
       dfz_damping: 0.0
     com:
@@ -103,7 +103,7 @@ robot_models:
       min_height: 0.6
     dcm_tracking:
       gains:
-        prop: 2.0
+        prop: 4.0
         integral: 10.0
         deriv: 0.5
       derivator_time_constant: 5.0
