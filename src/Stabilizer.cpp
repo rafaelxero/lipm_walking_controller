@@ -240,7 +240,8 @@ void Stabilizer::addGUIElements(mc_rtc::gui::StateBuilder & gui)
                                       plot::Y("dcm_ref", [this]() { return pendulum_.dcm().x(); }, Color::Red),
                                       plot::Y("dcm_mes", [this]() { return measuredDCM_.x(); }, Color::Magenta),
                                       plot::Y("zmp_ref", [this]() { return pendulum_.zmp().x(); }, Color::Blue),
-                                      plot::Y("zmp_mes", [this]() { return measuredZMP_.x(); }, Color::Cyan));
+                                      plot::Y("zmp_stabi", [this]() { return zmp().x(); }, Color::Black),
+                                      plot::Y("zmp_mes", [this]() { return measuredZMP_.x(); }, Color::Green));
                         }),
                  Button("Stop DCM-ZMP (x)", [&gui]() { gui.removePlot("DCM-ZMP Tracking (x)"); }));
 
@@ -253,7 +254,8 @@ void Stabilizer::addGUIElements(mc_rtc::gui::StateBuilder & gui)
                                       plot::Y("dcm_ref", [this]() { return pendulum_.dcm().y(); }, Color::Red),
                                       plot::Y("dcm_mes", [this]() { return measuredDCM_.y(); }, Color::Magenta),
                                       plot::Y("zmp_ref", [this]() { return pendulum_.zmp().y(); }, Color::Blue),
-                                      plot::Y("zmp_mes", [this]() { return measuredZMP_.y(); }, Color::Cyan));
+                                      plot::Y("zmp_stabi", [this]() { return zmp().y(); }, Color::Black),
+                                      plot::Y("zmp_mes", [this]() { return measuredZMP_.y(); }, Color::Green));
                         }),
                  Button("Stop DCM-ZMP (y)", [&gui]() { gui.removePlot("DCM-ZMP Tracking (y)"); }));
 
