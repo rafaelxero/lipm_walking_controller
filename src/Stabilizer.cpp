@@ -126,110 +126,166 @@ void Stabilizer::addLogEntries(mc_rtc::Logger & logger)
   logger.addLogEntry("stabilizer_zmpcc_leakRate", [this]() { return zmpccIntegrator_.rate(); });
 }
 
-void Stabilizer::addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui)
+void Stabilizer::addGUIElements(mc_rtc::gui::StateBuilder & gui)
 {
   using namespace mc_rtc::gui;
-  gui->addElement({"Stabilizer", "Main"}, Button("Disable stabilizer", [this]() { disable(); }),
-                  Button("Reconfigure", [this]() { reconfigure(); }),
-                  Button("Reset DCM integrator", [this]() { dcmIntegrator_.setZero(); }),
-                  ArrayInput("Foot admittance", {"CoPx", "CoPy"},
-                             [this]() -> Eigen::Vector2d {
-                               return {copAdmittance_.x(), copAdmittance_.y()};
-                             },
-                             [this](const Eigen::Vector2d & a) {
-                               copAdmittance_.x() = clamp(a(0), 0., MAX_COP_ADMITTANCE);
-                               copAdmittance_.y() = clamp(a(1), 0., MAX_COP_ADMITTANCE);
-                             }),
-                  ArrayInput("Foot force difference", {"Admittance", "Damping"},
-                             [this]() -> Eigen::Vector2d {
-                               return {dfzAdmittance_, dfzDamping_};
-                             },
-                             [this](const Eigen::Vector2d & a) {
-                               dfzAdmittance_ = clamp(a(0), 0., MAX_DFZ_ADMITTANCE);
-                               dfzDamping_ = clamp(a(1), 0., MAX_DFZ_DAMPING);
-                             }),
-                  ArrayInput("DCM gains", {"Prop.", "Integral", "Deriv."},
-                             [this]() -> Eigen::Vector3d {
-                               return {dcmPropGain_, dcmIntegralGain_, dcmDerivGain_};
-                             },
-                             [this](const Eigen::Vector3d & gains) {
-                               dcmPropGain_ = clamp(gains(0), 0., MAX_DCM_P_GAIN);
-                               dcmIntegralGain_ = clamp(gains(1), 0., MAX_DCM_I_GAIN);
-                               dcmDerivGain_ = clamp(gains(2), 0., MAX_DCM_D_GAIN);
-                             }),
-                  ArrayInput("DCM filters", {"Integrator T [s]", "Derivator T [s]"},
-                             [this]() -> Eigen::Vector2d {
-                               return {dcmIntegrator_.timeConstant(), dcmDerivator_.timeConstant()};
-                             },
-                             [this](const Eigen::Vector2d & T) {
-                               dcmIntegrator_.timeConstant(T(0));
-                               dcmDerivator_.timeConstant(T(1));
-                             }));
-  gui->addElement({"Stabilizer", "Advanced"}, Button("Disable stabilizer", [this]() { disable(); }),
-                  Button("Reconfigure", [this]() { reconfigure(); }),
-                  Button("Reset CoM integrator", [this]() { zmpccIntegrator_.setZero(); }),
-                  Checkbox("Apply CoM admittance only in double support?", [this]() { return zmpccOnlyDS_; },
-                           [this]() { zmpccOnlyDS_ = !zmpccOnlyDS_; }),
-                  ArrayInput("CoM admittance", {"Ax", "Ay"}, [this]() { return comAdmittance_; },
-                             [this](const Eigen::Vector2d & a) {
-                               comAdmittance_.x() = clamp(a.x(), 0., MAX_COM_ADMITTANCE);
-                               comAdmittance_.y() = clamp(a.y(), 0., MAX_COM_ADMITTANCE);
-                             }),
-                  NumberInput("CoM integrator leak rate [Hz]", [this]() { return zmpccIntegrator_.rate(); },
-                              [this](double T) { zmpccIntegrator_.rate(T); }),
-                  ArrayInput("DCM pole placement", {"Pole1", "Pole2", "Pole3", "Lag [Hz]"},
-                             [this]() -> Eigen::VectorXd { return polePlacement_; },
-                             [this](const Eigen::VectorXd & polePlacement) {
-                               double alpha = clamp(polePlacement(0), -20., -0.1);
-                               double beta = clamp(polePlacement(1), -20., -0.1);
-                               double gamma = clamp(polePlacement(2), -20., -0.1);
-                               double lagFreq = clamp(polePlacement(3), 1., 200.);
-                               polePlacement_ = {alpha, beta, gamma, lagFreq};
+  gui.addElement({"Stabilizer", "Main"}, Button("Disable stabilizer", [this]() { disable(); }),
+                 Button("Reconfigure", [this]() { reconfigure(); }),
+                 Button("Reset DCM integrator", [this]() { dcmIntegrator_.setZero(); }),
+                 ArrayInput("Foot admittance", {"CoPx", "CoPy"},
+                            [this]() -> Eigen::Vector2d {
+                              return {copAdmittance_.x(), copAdmittance_.y()};
+                            },
+                            [this](const Eigen::Vector2d & a) {
+                              copAdmittance_.x() = clamp(a(0), 0., MAX_COP_ADMITTANCE);
+                              copAdmittance_.y() = clamp(a(1), 0., MAX_COP_ADMITTANCE);
+                            }),
+                 ArrayInput("Foot force difference", {"Admittance", "Damping"},
+                            [this]() -> Eigen::Vector2d {
+                              return {dfzAdmittance_, dfzDamping_};
+                            },
+                            [this](const Eigen::Vector2d & a) {
+                              dfzAdmittance_ = clamp(a(0), 0., MAX_DFZ_ADMITTANCE);
+                              dfzDamping_ = clamp(a(1), 0., MAX_DFZ_DAMPING);
+                            }),
+                 ArrayInput("DCM gains", {"Prop.", "Integral", "Deriv."},
+                            [this]() -> Eigen::Vector3d {
+                              return {dcmPropGain_, dcmIntegralGain_, dcmDerivGain_};
+                            },
+                            [this](const Eigen::Vector3d & gains) {
+                              dcmPropGain_ = clamp(gains(0), 0., MAX_DCM_P_GAIN);
+                              dcmIntegralGain_ = clamp(gains(1), 0., MAX_DCM_I_GAIN);
+                              dcmDerivGain_ = clamp(gains(2), 0., MAX_DCM_D_GAIN);
+                            }),
+                 ArrayInput("DCM filters", {"Integrator T [s]", "Derivator T [s]"},
+                            [this]() -> Eigen::Vector2d {
+                              return {dcmIntegrator_.timeConstant(), dcmDerivator_.timeConstant()};
+                            },
+                            [this](const Eigen::Vector2d & T) {
+                              dcmIntegrator_.timeConstant(T(0));
+                              dcmDerivator_.timeConstant(T(1));
+                            }));
+  gui.addElement({"Stabilizer", "Advanced"}, Button("Disable stabilizer", [this]() { disable(); }),
+                 Button("Reconfigure", [this]() { reconfigure(); }),
+                 Button("Reset CoM integrator", [this]() { zmpccIntegrator_.setZero(); }),
+                 Checkbox("Apply CoM admittance only in double support?", [this]() { return zmpccOnlyDS_; },
+                          [this]() { zmpccOnlyDS_ = !zmpccOnlyDS_; }),
+                 ArrayInput("CoM admittance", {"Ax", "Ay"}, [this]() { return comAdmittance_; },
+                            [this](const Eigen::Vector2d & a) {
+                              comAdmittance_.x() = clamp(a.x(), 0., MAX_COM_ADMITTANCE);
+                              comAdmittance_.y() = clamp(a.y(), 0., MAX_COM_ADMITTANCE);
+                            }),
+                 NumberInput("CoM integrator leak rate [Hz]", [this]() { return zmpccIntegrator_.rate(); },
+                             [this](double T) { zmpccIntegrator_.rate(T); }),
+                 ArrayInput("DCM pole placement", {"Pole1", "Pole2", "Pole3", "Lag [Hz]"},
+                            [this]() -> Eigen::VectorXd { return polePlacement_; },
+                            [this](const Eigen::VectorXd & polePlacement) {
+                              double alpha = clamp(polePlacement(0), -20., -0.1);
+                              double beta = clamp(polePlacement(1), -20., -0.1);
+                              double gamma = clamp(polePlacement(2), -20., -0.1);
+                              double lagFreq = clamp(polePlacement(3), 1., 200.);
+                              polePlacement_ = {alpha, beta, gamma, lagFreq};
 
-                               double omega = pendulum_.omega();
-                               double denom = pendulum_.omega() * lagFreq;
-                               double T_integ = dcmIntegrator_.timeConstant();
+                              double omega = pendulum_.omega();
+                              double denom = pendulum_.omega() * lagFreq;
+                              double T_integ = dcmIntegrator_.timeConstant();
 
-                               // Gains K_z for the ZMP feedback (Delta ZMP = K_z * Delta DCM)
-                               double zmpPropGain =
-                                   (alpha * beta + beta * gamma + gamma * alpha + omega * lagFreq) / denom;
-                               double zmpIntegralGain = -(alpha * beta * gamma) / denom;
-                               double zmpDerivGain = -(alpha + beta + gamma + lagFreq - omega) / denom;
+                              // Gains K_z for the ZMP feedback (Delta ZMP = K_z * Delta DCM)
+                              double zmpPropGain =
+                                  (alpha * beta + beta * gamma + gamma * alpha + omega * lagFreq) / denom;
+                              double zmpIntegralGain = -(alpha * beta * gamma) / denom;
+                              double zmpDerivGain = -(alpha + beta + gamma + lagFreq - omega) / denom;
 
-                               // Our gains K are for closed-loop DCM (Delta dot(DCM) = -K * Delta DCM)
-                               dcmPropGain_ = omega * (zmpPropGain - 1.);
-                               dcmIntegralGain_ = omega * T_integ * zmpIntegralGain; // our integrator is an EMA
-                               dcmDerivGain_ = omega * zmpDerivGain;
-                             }),
-                  ArrayInput("Vertical drift compensation", {"frequency", "stiffness"},
-                             [this]() -> Eigen::Vector2d {
-                               return {vdcFrequency_, vdcStiffness_};
-                             },
-                             [this](const Eigen::Vector2d & v) {
-                               vdcFrequency_ = clamp(v(0), 0., 10.);
-                               vdcStiffness_ = clamp(v(1), 0., 1e4);
-                             }),
-                  ArrayInput("Wrench distribution weights", {"Net wrench", "Ankle torques", "Force ratio"},
-                             [this]() -> Eigen::Vector3d {
-                               double netWrench = std::pow(fdqpWeights_.netWrenchSqrt, 2);
-                               double ankleTorque = std::pow(fdqpWeights_.ankleTorqueSqrt, 2);
-                               double forceRatio = std::pow(fdqpWeights_.forceRatioSqrt, 2);
-                               return {netWrench, ankleTorque, forceRatio};
-                             },
-                             [this](const Eigen::Vector3d & weights) {
-                               fdqpWeights_.netWrenchSqrt = std::sqrt(weights(0));
-                               fdqpWeights_.ankleTorqueSqrt = std::sqrt(weights(1));
-                               fdqpWeights_.forceRatioSqrt = std::sqrt(weights(2));
-                             }));
-  gui->addElement({"Stabilizer", "Errors"}, Button("Disable stabilizer", [this]() { disable(); }),
-                  Button("Reconfigure", [this]() { reconfigure(); }),
-                  ArrayLabel("CoM offset [mm]", {"x", "y"}, [this]() { return vecFromError(zmpccCoMOffset_); }),
-                  ArrayLabel("DCM average error [mm]", {"x", "y"}, [this]() { return vecFromError(dcmAverageError_); }),
-                  ArrayLabel("DCM error [mm]", {"x", "y"}, [this]() { return vecFromError(dcmError_); }),
-                  ArrayLabel("Foot force difference error", {"force [N]", "height [mm]"}, [this]() {
-                    Eigen::Vector3d dfzError = {dfzForceError_ / 1000., dfzHeightError_, 0.};
-                    return vecFromError(dfzError);
-                  }));
+                              // Our gains K are for closed-loop DCM (Delta dot(DCM) = -K * Delta DCM)
+                              dcmPropGain_ = omega * (zmpPropGain - 1.);
+                              dcmIntegralGain_ = omega * T_integ * zmpIntegralGain; // our integrator is an EMA
+                              dcmDerivGain_ = omega * zmpDerivGain;
+                            }),
+                 ArrayInput("Vertical drift compensation", {"frequency", "stiffness"},
+                            [this]() -> Eigen::Vector2d {
+                              return {vdcFrequency_, vdcStiffness_};
+                            },
+                            [this](const Eigen::Vector2d & v) {
+                              vdcFrequency_ = clamp(v(0), 0., 10.);
+                              vdcStiffness_ = clamp(v(1), 0., 1e4);
+                            }),
+                 ArrayInput("Wrench distribution weights", {"Net wrench", "Ankle torques", "Force ratio"},
+                            [this]() -> Eigen::Vector3d {
+                              double netWrench = std::pow(fdqpWeights_.netWrenchSqrt, 2);
+                              double ankleTorque = std::pow(fdqpWeights_.ankleTorqueSqrt, 2);
+                              double forceRatio = std::pow(fdqpWeights_.forceRatioSqrt, 2);
+                              return {netWrench, ankleTorque, forceRatio};
+                            },
+                            [this](const Eigen::Vector3d & weights) {
+                              fdqpWeights_.netWrenchSqrt = std::sqrt(weights(0));
+                              fdqpWeights_.ankleTorqueSqrt = std::sqrt(weights(1));
+                              fdqpWeights_.forceRatioSqrt = std::sqrt(weights(2));
+                            }));
+  gui.addElement({"Stabilizer", "Errors"}, Button("Disable stabilizer", [this]() { disable(); }),
+                 Button("Reconfigure", [this]() { reconfigure(); }),
+                 ArrayLabel("CoM offset [mm]", {"x", "y"}, [this]() { return vecFromError(zmpccCoMOffset_); }),
+                 ArrayLabel("DCM average error [mm]", {"x", "y"}, [this]() { return vecFromError(dcmAverageError_); }),
+                 ArrayLabel("DCM error [mm]", {"x", "y"}, [this]() { return vecFromError(dcmError_); }),
+                 ArrayLabel("Foot force difference error", {"force [N]", "height [mm]"}, [this]() {
+                   Eigen::Vector3d dfzError = {dfzForceError_ / 1000., dfzHeightError_, 0.};
+                   return vecFromError(dfzError);
+                 }));
+
+  gui.addElement({"Stabilizer", "Plots"}, ElementsStacking::Horizontal,
+                 Button("Plot DCM-ZMP Tracking (x)",
+                        [this, &gui]() {
+                          gui.addPlot("DCM-ZMP Tracking (x)", plot::X("t", [this]() { return t_; }),
+                                      plot::Y("support_min", [this]() { return supportMin_.x(); }, Color::Red),
+                                      plot::Y("support_max", [this]() { return supportMax_.x(); }, Color::Red),
+                                      plot::Y("dcm_ref", [this]() { return pendulum_.dcm().x(); }, Color::Red),
+                                      plot::Y("dcm_mes", [this]() { return measuredDCM_.x(); }, Color::Magenta),
+                                      plot::Y("zmp_ref", [this]() { return pendulum_.zmp().x(); }, Color::Blue),
+                                      plot::Y("zmp_stabi", [this]() { return zmp().x(); }, Color::Black),
+                                      plot::Y("zmp_mes", [this]() { return measuredZMP_.x(); }, Color::Green));
+                        }),
+                 Button("Stop DCM-ZMP (x)", [&gui]() { gui.removePlot("DCM-ZMP Tracking (x)"); }));
+
+  gui.addElement({"Stabilizer", "Plots"}, ElementsStacking::Horizontal,
+                 Button("Plot DCM-ZMP Tracking (y)",
+                        [this, &gui]() {
+                          gui.addPlot("DCM-ZMP Tracking (y)", plot::X("t", [this]() { return t_; }),
+                                      plot::Y("support_min", [this]() { return supportMin_.y(); }, Color::Red),
+                                      plot::Y("support_max", [this]() { return supportMax_.y(); }, Color::Red),
+                                      plot::Y("dcm_ref", [this]() { return pendulum_.dcm().y(); }, Color::Red),
+                                      plot::Y("dcm_mes", [this]() { return measuredDCM_.y(); }, Color::Magenta),
+                                      plot::Y("zmp_ref", [this]() { return pendulum_.zmp().y(); }, Color::Blue),
+                                      plot::Y("zmp_stabi", [this]() { return zmp().y(); }, Color::Black),
+                                      plot::Y("zmp_mes", [this]() { return measuredZMP_.y(); }, Color::Green));
+                        }),
+                 Button("Stop DCM-ZMP (y)", [&gui]() { gui.removePlot("DCM-ZMP Tracking (y)"); }));
+
+  gui.addElement({"Stabilizer", "Plots"}, ElementsStacking::Horizontal,
+                 Button("Plot CoM Tracking (x)",
+                        [this, &gui]() {
+                          gui.addPlot("CoM Tracking (x)", plot::X("t", [this]() { return t_; }),
+                                      plot::Y("com_ref", [this]() { return pendulum_.com().x(); }, Color::Red),
+                                      plot::Y("com_mes", [this]() { return measuredCoM_.y(); }, Color::Magenta));
+                        }),
+                 Button("Stop CoM (x)", [&gui]() { gui.removePlot("CoM Tracking (x)"); }));
+
+  gui.addElement({"Stabilizer", "Plots"}, ElementsStacking::Horizontal,
+                 Button("Plot DCM Integrator",
+                        [this, &gui]() {
+                          gui.addPlot("DCM Integrator", plot::X("t", [this]() { return t_; }),
+                                      plot::Y("x", [this]() { return dcmIntegrator_.eval().x(); }, Color::Red),
+                                      plot::Y("y", [this]() { return dcmIntegrator_.eval().y(); }, Color::Green),
+                                      plot::Y("z", [this]() { return dcmIntegrator_.eval().z(); }, Color::Blue));
+                        }),
+                 Button("Stop DCM Integrator", [&gui]() { gui.removePlot("DCM Integrator"); }));
+  gui.addElement({"Stabilizer", "Plots"}, ElementsStacking::Horizontal,
+                 Button("Plot DCM Derivator",
+                        [this, &gui]() {
+                          gui.addPlot("DCM Derivator", plot::X("t", [this]() { return t_; }),
+                                      plot::Y("x", [this]() { return dcmDerivator_.eval().x(); }, Color::Red),
+                                      plot::Y("y", [this]() { return dcmDerivator_.eval().y(); }, Color::Green),
+                                      plot::Y("z", [this]() { return dcmDerivator_.eval().z(); }, Color::Blue));
+                        }),
+                 Button("Stop DCM Derivator", [&gui]() { gui.removePlot("DCM Derivator"); }));
 }
 
 void Stabilizer::disable()
@@ -515,6 +571,32 @@ void Stabilizer::run()
   updateFootForceDifferenceControl();
   auto endTime = std::chrono::high_resolution_clock::now();
   runTime_ = std::chrono::duration<double, std::milli>(endTime - startTime).count();
+
+  updateSupportBoundaries();
+}
+
+void Stabilizer::updateSupportBoundaries()
+{
+  // Reset support area boundaries
+  supportMin_ = std::numeric_limits<double>::max() * Eigen::Vector2d::Ones();
+  supportMax_ = -supportMin_;
+  switch(contactState_)
+  {
+    case ContactState::DoubleSupport:
+      supportMin_ = {std::min(leftFootContact.xmin(), rightFootContact.xmin()),
+                     std::min(leftFootContact.ymin(), rightFootContact.ymin())};
+      supportMax_ = {std::max(leftFootContact.xmax(), rightFootContact.xmax()),
+                     std::max(leftFootContact.ymax(), rightFootContact.ymax())};
+      break;
+    case ContactState::LeftFoot:
+      supportMin_ = {leftFootContact.xmin(), leftFootContact.ymin()};
+      supportMax_ = {leftFootContact.xmax(), leftFootContact.ymax()};
+      break;
+    case ContactState::RightFoot:
+      supportMin_ = {rightFootContact.xmin(), rightFootContact.ymin()};
+      supportMax_ = {rightFootContact.xmax(), rightFootContact.ymax()};
+      break;
+  }
 }
 
 void Stabilizer::updateState(const Eigen::Vector3d & com,
@@ -526,6 +608,8 @@ void Stabilizer::updateState(const Eigen::Vector3d & com,
   measuredCoM_ = com;
   measuredCoMd_ = comd;
   measuredWrench_ = wrench;
+  measuredDCM_ = measuredCoM_ + measuredCoMd_ / pendulum_.omega();
+  t_ += dt_;
 }
 
 sva::ForceVecd Stabilizer::computeDesiredWrench()

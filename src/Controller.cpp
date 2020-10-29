@@ -135,7 +135,7 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   {
     addGUIElements(gui_);
     mpc_.addGUIElements(gui_);
-    stabilizer_.addGUIElements(gui_);
+    stabilizer_.addGUIElements(*gui_);
   }
 
   mc_rtc::log::success("LIPMWalking controller init done.");
