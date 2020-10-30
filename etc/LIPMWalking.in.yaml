@@ -66,7 +66,7 @@ robot_models:
   hrp4j:
     admittance:
       com: [0, 0]
-      cop: [0.01, 0.01]
+      cop: [0.02, 0.04]
       dfz: 0.0001
       dfz_damping: 0
     com:
@@ -76,10 +76,10 @@ robot_models:
       min_height: 0.55
     dcm_tracking:
       gains:
-        prop: 2
+        prop: 4
         integral: 10
-        deriv: 0
-      derivator_time_constant: 1
+        deriv: 0.2
+      derivator_time_constant: 5
       integrator_time_constant: 10
     sole:
       half_length: 0.08
@@ -567,9 +567,9 @@ plans:
             translation: [0.0, 0.09, 0.0]
           surface: LeftFootCenter
     custom_backward_close:
-      double_support_duration: 0.2
+      double_support_duration: 0.5
       single_support_duration: 0.8
-      step_length: 0.15
+      step_length: 0.1
       swing_height: 0.05
       contacts:
         - pose:
@@ -591,8 +591,8 @@ plans:
             translation: [0.0, 0.09, 0.0]
           surface: LeftFootCenter
     custom_forward_close:
-      double_support_duration: 0.1
-      single_support_duration: 0.7
+      double_support_duration: 0.5
+      single_support_duration: 0.8
       step_length: 0.2
       swing_height: 0.04
       contacts:
@@ -603,8 +603,8 @@ plans:
             translation: [0.0, 0.07, 0.0]
           surface: LeftFootCenter
     custom_forward_superclose:
-      double_support_duration: 0.1
-      single_support_duration: 0.7
+      double_support_duration: 0.5
+      single_support_duration: 0.8
       step_length: 0.2
       swing_height: 0.04
       contacts:
@@ -632,7 +632,7 @@ plans:
           vel: [10.0, 300.0]
           zmp: 1000.0
     custom_lateral_close:
-      double_support_duration: 0.2
+      double_support_duration: 0.5
       single_support_duration: 0.8
       step_length: 0.1
       swing_height: 0.04
@@ -740,7 +740,7 @@ plans:
             translation: [0.035, 0.09, 0.0]
           surface: LeftFootCenter
     warmup_close:
-      double_support_duration: 0.1
+      double_support_duration: 0.5
       single_support_duration: 0.7
       swing_height: 0.04
       contacts:
