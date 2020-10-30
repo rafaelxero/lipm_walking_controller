@@ -76,14 +76,14 @@ robot_models:
       min_height: 0.55
     dcm_tracking:
       gains:
-        prop: 5
+        prop: 2
         integral: 10
         deriv: 0
       derivator_time_constant: 1
       integrator_time_constant: 10
     sole:
-      half_length: 0.112
-      half_width: 0.065
+      half_length: 0.08
+      half_width: 0.038
       friction: 0.7
     torso:
       max_pitch: 0.4
