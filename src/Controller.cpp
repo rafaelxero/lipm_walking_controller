@@ -137,6 +137,28 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
     mpc_.addGUIElements(gui_);
     stabilizer_.addGUIElements(*gui_);
   }
+  
+  gui_->addElement({"Stabilizer", "CustomStuff"},
+    mc_rtc::gui::NumberInput("VelFilter",
+                             [this]()
+                             {
+                               return comVelFilter_.cutoffPeriod();
+                             },
+                             [this](double cutoff)
+                             {
+                               comVelFilter_.cutoffPeriod(cutoff);
+                             }),
+    mc_rtc::gui::ArrayInput("AnkleOffset",
+                             [this]() -> Eigen::Vector2d
+                             {
+                               return sole_.leftAnkleOffset;
+                             },
+                             [this](const Eigen::Vector2d & offset)
+                             {
+                               sole_.leftAnkleOffset = offset;
+                               mpc_.sole(sole_);
+                             })
+  );
 
   mc_rtc::log::success("LIPMWalking controller init done.");
 }
