@@ -103,7 +103,8 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   sva::PTransformd X_rfc_lfc = X_0_lfc * X_0_rfc.inv();
   double stepWidth = X_rfc_lfc.translation().y();
   sole_ = robotConfig("sole");
-  sole_.leftAnkleOffset = X_lfc_lf.translation().head<2>();
+  //sole_.leftAnkleOffset = X_lfc_lf.translation().head<2>();
+  sole_.leftAnkleOffset = {0. ,0.};
 
   // Configure MPC solver
   mpcConfig_ = config("mpc");
@@ -137,7 +138,7 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
     mpc_.addGUIElements(gui_);
     stabilizer_.addGUIElements(*gui_);
   }
-  
+
   gui_->addElement({"Stabilizer", "CustomStuff"},
     mc_rtc::gui::NumberInput("VelFilter",
                              [this]()
