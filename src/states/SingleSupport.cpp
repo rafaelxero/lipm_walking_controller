@@ -48,7 +48,7 @@ void states::SingleSupport::start()
     stabilizer()->setContacts({{ContactState::Left, supportContact.pose}});
     swingFootTask = ctl.swingFootTaskRight_;
   }
-  else // (ctl.supportContact.surfaceName == "RightFootCenter")
+  else
   {
     ctl.leftFootRatio(0.);
     stabilizer()->setContacts({{ContactState::Right, supportContact.pose}});
@@ -140,7 +140,7 @@ void states::SingleSupport::updateSwingFoot()
       swingFootTask->refVelB(swingFoot_.vel());
       swingFootTask->refAccel(swingFoot_.accel());
     }
-    else // (stabilizer().contactState() != ContactState::DoubleSupport)
+    else
     {
       if(supportContact.surfaceName == "LeftFootCenter")
       {
