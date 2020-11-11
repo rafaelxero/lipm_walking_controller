@@ -69,10 +69,6 @@ void states::Standing::start()
     ctl.loadFootstepPlan(ctl.plan.name);
   }
 
-  // stabilizer().contactState(ContactState::DoubleSupport);
-  // stabilizer().setContact(stabilizer().leftFootTask, leftFootContact_);
-  // stabilizer().setContact(stabilizer().rightFootTask, rightFootContact_);
-  // stabilizer().addTasks(ctl.solver());
   stabilizer()->setContacts(
       {{ContactState::Left, leftFootContact_.pose}, {ContactState::Right, rightFootContact_.pose}});
   ctl.solver().addTask(stabilizer());
