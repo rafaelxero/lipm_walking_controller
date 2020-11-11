@@ -44,9 +44,18 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   auto robotConfig = config("robot_models")(controlRobot().name());
   auto planConfig = config("plans")(controlRobot().name());
 
+  mc_rtc::log::info("Loading default stabilizer configuration");
+  auto stabiConfig = robot().module().defaultLIPMStabilizerConfiguration();
+  if(robotConfig.has("stabilizer"))
+  {
+    mc_rtc::log::info("Loading additional stabilizer configuration:\n{}", robotConfig("stabilizer").dump(true));
+    stabiConfig.load(robotConfig("stabilizer"));
+    mc_rtc::log::info("Stabi prop {}", stabiConfig.dcmPropGain);
+  }
+
   // Patch CoM height and step width in all plans
   std::vector<std::string> plans = planConfig.keys();
-  double comHeight = robotConfig("com")("height");
+  double comHeight = stabiConfig.comHeight;
   for(const auto & p : plans)
   {
     auto plan = planConfig(p);
@@ -84,37 +93,18 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   sole_.leftAnkleOffset = X_lfc_lf.translation().head<2>();
 
   // Configure MPC solver
-  // TODO sole for the MPC
   mpcConfig_ = config("mpc");
   mpc_.sole(sole_);
 
   // ====================
   // Create Stabilizer
   // - Default configuration from the robot module
-  // - Additional configuration from the configuration, in section
-  //    robot_name
-  //    {
-  //      Stabilizer
-  //      {
-  //        ... stabilizer configuration ...
-  //      }
-  //    }
+  // - Additional configuration from the configuration, in section robot_models/robot_name/stabilizer
   // ====================
-  mc_rtc::log::info("Loading default stabilizer configuration");
-  auto & stabiConf = defaultStabilizerConfig_;
-  stabiConf = robot().module().defaultLIPMStabilizerConfiguration();
   stabilizer_.reset(new mc_tasks::lipm_stabilizer::StabilizerTask(
-      solver().robots(), solver().realRobots(), robot().robotIndex(), stabiConf.leftFootSurface,
-      stabiConf.rightFootSurface, stabiConf.torsoBodyName, solver().dt()));
-  if(config.has(robot().name()))
-  {
-    if(config.has("Stabilizer"))
-    {
-      mc_rtc::log::info("Loading additional stabilizer configuration");
-      stabiConf.load(config("Stabilizer"));
-    }
-  }
-  stabilizer_->configure(stabiConf);
+      solver().robots(), solver().realRobots(), robot().robotIndex(), stabiConfig.leftFootSurface,
+      stabiConfig.rightFootSurface, stabiConfig.torsoBodyName, solver().dt()));
+  stabilizer_->configure(stabiConfig);
 
   // Read footstep plans from configuration
   planInterpolator.configure(planConfig);
