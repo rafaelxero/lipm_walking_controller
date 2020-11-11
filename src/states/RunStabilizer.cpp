@@ -14,9 +14,7 @@ void states::RunStabilizer::start()
   output("OK");
 }
 
-void states::RunStabilizer::runState()
-{
-}
+void states::RunStabilizer::runState() {}
 
 void states::RunStabilizer::teardown()
 {

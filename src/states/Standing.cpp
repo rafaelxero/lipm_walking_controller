@@ -69,8 +69,7 @@ void states::Standing::start()
     ctl.loadFootstepPlan(ctl.plan.name);
   }
 
-  stabilizer()->setContacts(
-      {{ContactState::Left, leftFootContact_.pose}, {ContactState::Right, rightFootContact_.pose}});
+  ctl.setContacts({{ContactState::Left, leftFootContact_.pose}, {ContactState::Right, rightFootContact_.pose}});
 
   updatePlan(ctl.plan.name);
   updateTarget(leftFootRatio_);

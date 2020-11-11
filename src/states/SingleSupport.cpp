@@ -45,13 +45,13 @@ void states::SingleSupport::start()
   if(supportContact.surfaceName == "LeftFootCenter")
   {
     ctl.leftFootRatio(1.);
-    stabilizer()->setContacts({{ContactState::Left, supportContact.pose}});
+    ctl.setContacts({{ContactState::Left, supportContact.pose}});
     swingFootTask = ctl.swingFootTaskRight_;
   }
   else
   {
     ctl.leftFootRatio(0.);
-    stabilizer()->setContacts({{ContactState::Right, supportContact.pose}});
+    ctl.setContacts({{ContactState::Right, supportContact.pose}});
     swingFootTask = ctl.swingFootTaskLeft_;
   }
   swingFootTask->reset();

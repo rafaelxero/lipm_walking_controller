@@ -62,14 +62,12 @@ void states::DoubleSupport::start()
 
   if(ctl.prevContact().surfaceName == "LeftFootCenter")
   {
-    stabilizer()->setContacts(
-        {{ContactState::Left, ctl.prevContact().pose}, {ContactState::Right, ctl.supportContact().pose}});
+    ctl.setContacts({{ContactState::Left, ctl.prevContact().pose}, {ContactState::Right, ctl.supportContact().pose}});
     targetLeftFootRatio_ = 0.;
   }
   else // (ctl.prevContact().surfaceName == "RightFootCenter")
   {
-    stabilizer()->setContacts(
-        {{ContactState::Left, ctl.supportContact().pose}, {ContactState::Right, ctl.prevContact().pose}});
+    ctl.setContacts({{ContactState::Left, ctl.supportContact().pose}, {ContactState::Right, ctl.prevContact().pose}});
     targetLeftFootRatio_ = 1.;
   }
   if(stopDuringThisDSP_)

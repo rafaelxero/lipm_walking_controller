@@ -16,7 +16,7 @@ namespace lipm_walking
 namespace states
 {
 
-/** 
+/**
  * Adds/removes the global stabilizer task to the QP
  */
 struct RunStabilizer : State
