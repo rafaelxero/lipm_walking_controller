@@ -29,3 +29,5 @@ add_fsm_state_simple(Initial)
 add_fsm_state_simple(Standing)
 add_fsm_state_simple(DoubleSupport)
 add_fsm_state_simple(SingleSupport)
+
+add_fsm_state_simple(RunStabilizer)

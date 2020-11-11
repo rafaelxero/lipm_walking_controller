@@ -251,6 +251,7 @@ void Controller::reset(const mc_control::ControllerResetData & data)
   mc_control::fsm::Controller::reset(data);
 
   stabilizer_->reset();
+  stabilizer()->setContacts({ContactState::Left, ContactState::Right});
 
   if(gui_)
   {

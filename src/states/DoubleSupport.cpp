@@ -76,7 +76,6 @@ void states::DoubleSupport::start()
   {
     targetLeftFootRatio_ = 0.5;
   }
-  controller().solver().addTask(stabilizer());
 
   logger().addLogEntry("rem_phase_time", [this]() { return remTime_; });
   logger().addLogEntry("walking_phase", []() { return 2.; });
@@ -91,8 +90,6 @@ void states::DoubleSupport::start()
 
 void states::DoubleSupport::teardown()
 {
-  controller().solver().removeTask(stabilizer());
-
   logger().removeLogEntry("rem_phase_time");
   logger().removeLogEntry("walking_phase");
 }

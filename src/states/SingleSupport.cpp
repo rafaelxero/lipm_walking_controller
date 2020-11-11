@@ -63,7 +63,6 @@ void states::SingleSupport::start()
   swingFoot_.takeoffOffset(ctl.plan.takeoffOffset());
   swingFoot_.takeoffPitch(ctl.plan.takeoffPitch());
   swingFoot_.reset(swingFootTask->surfacePose(), targetContact.pose, duration_, ctl.plan.swingHeight());
-  ctl.solver().addTask(stabilizer());
 
   logger().addLogEntry("rem_phase_time", [this]() { return remTime_; });
   logger().addLogEntry("walking_phase", []() { return 1.; });
@@ -74,7 +73,6 @@ void states::SingleSupport::start()
 
 void states::SingleSupport::teardown()
 {
-  controller().solver().removeTask(stabilizer());
   controller().solver().removeTask(swingFootTask);
 
   logger().removeLogEntry("contact_impulse");

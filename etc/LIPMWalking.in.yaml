@@ -964,18 +964,28 @@ robots:
 #
 # Finite state machine
 #
-StatesFiles: []
-StatesLibraries: ["@MC_CONTROLLER_INSTALL_PREFIX@/lipm_walking_controller/states"]
+StatesFiles:
+- "@MC_STATES_DEFAULT_INSTALL_PREFIX@/data"
+StatesLibraries:
+- "@MC_STATES_DEFAULT_INSTALL_PREFIX@"
+- "@MC_CONTROLLER_INSTALL_PREFIX@/lipm_walking_controller/states"
 Managed: false
 StepByStep: false
 init: Initial
-states: {}
+states:
+  WalkInternal:
+    base: Meta
+    transitions:
+    - [Standing, DoubleSupport, DoubleSupport]
+    - [DoubleSupport, SingleSupport, SingleSupport]
+    - [DoubleSupport, Standing, Standing]
+    - [SingleSupport, DoubleSupport, DoubleSupport]
+  WalkFSM:
+    base: Parallel
+    states: [RunStabilizer, WalkInternal]
+
 transitions:
-  - [Initial, Standing, Standing]
-  - [Standing, DoubleSupport, DoubleSupport]
-  - [DoubleSupport, SingleSupport, SingleSupport]
-  - [DoubleSupport, Standing, Standing]
-  - [SingleSupport, DoubleSupport, DoubleSupport]
+  - [Initial, Standing, WalkFSM]
 
 # Set realRobot's joint configuration from encoder readings
 ObserverPipelines:

@@ -71,7 +71,6 @@ void states::Standing::start()
 
   stabilizer()->setContacts(
       {{ContactState::Left, leftFootContact_.pose}, {ContactState::Right, rightFootContact_.pose}});
-  ctl.solver().addTask(stabilizer());
 
   updatePlan(ctl.plan.name);
   updateTarget(leftFootRatio_);
@@ -124,8 +123,6 @@ void states::Standing::start()
 void states::Standing::teardown()
 {
   auto & ctl = controller();
-
-  ctl.solver().removeTask(stabilizer());
 
   logger().removeLogEntry("walking_phase");
 
