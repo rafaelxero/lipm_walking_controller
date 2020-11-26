@@ -251,7 +251,7 @@ void Controller::reset(const mc_control::ControllerResetData & data)
   mc_control::fsm::Controller::reset(data);
 
   stabilizer_->reset();
-  setContacts({{ContactState::Left, supportContact().pose}, {ContactState::Right, targetContact().pose}});
+  setContacts({{ContactState::Left, supportContact().pose}, {ContactState::Right, targetContact().pose}}, true);
 
   if(gui_)
   {
@@ -260,7 +260,7 @@ void Controller::reset(const mc_control::ControllerResetData & data)
 }
 
 void Controller::setContacts(
-    const std::vector<std::pair<mc_tasks::lipm_stabilizer::ContactState, sva::PTransformd>> & contacts)
+    const std::vector<std::pair<mc_tasks::lipm_stabilizer::ContactState, sva::PTransformd>> & contacts, bool fullDoF)
 {
   stabilizer()->setContacts(contacts);
   auto rName = robot().name();
@@ -273,9 +273,12 @@ void Controller::setContacts(
   {
     const auto & rSurface = stabilizer()->footSurface(contact.first);
     Eigen::Vector6d dof = Eigen::Vector6d::Ones();
-    dof(0) = 0;
-    dof(1) = 0;
-    dof(5) = 0;
+    if(!fullDoF)
+    {
+      dof(0) = 0;
+      dof(1) = 0;
+      dof(5) = 0;
+    }
     addContact({rName, gName, rSurface, gSurface, friction, dof});
   }
 }
