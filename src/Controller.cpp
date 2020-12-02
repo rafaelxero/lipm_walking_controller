@@ -90,7 +90,16 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   sva::PTransformd X_rfc_lfc = X_0_lfc * X_0_rfc.inv();
   double stepWidth = X_rfc_lfc.translation().y();
   sole_ = robotConfig("sole");
-  sole_.leftAnkleOffset = X_lfc_lf.translation().head<2>();
+
+  // If an ankle offset is specified use it, otherwise compute it
+  if(robotConfig("sole").has("leftAnkleOffset"))
+  {
+    sole_.leftAnkleOffset = robotConfig("sole")("leftAnkleOffset");
+  }
+  else
+  {
+    sole_.leftAnkleOffset = X_lfc_lf.translation().head<2>();
+  }
 
   // Configure MPC solver
   mpcConfig_ = config("mpc");
