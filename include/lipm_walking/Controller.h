@@ -283,7 +283,8 @@ struct MC_CONTROL_DLLAPI Controller : public mc_control::fsm::Controller
   }
 
   /* Set contacts to the stabilizer and QP */
-  void setContacts(const std::vector<std::pair<mc_tasks::lipm_stabilizer::ContactState, sva::PTransformd>> & contacts, bool fullDoF=false);
+  void setContacts(const std::vector<std::pair<mc_tasks::lipm_stabilizer::ContactState, sva::PTransformd>> & contacts,
+                   bool fullDoF = false);
 
   /** Get current support contact.
    *

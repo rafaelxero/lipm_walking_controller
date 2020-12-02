@@ -208,6 +208,10 @@ void Controller::addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui)
         }
         return polygons;
       }));
+  gui->addElement(
+      {"Markers", "Sole"},
+      mc_rtc::gui::Point3D("Target Ankle Pos", [this]() { return this->targetContact().anklePos(sole_); }),
+      mc_rtc::gui::Point3D("Support Ankle Pos", [this]() { return this->supportContact().anklePos(sole_); }));
 
   gui->addElement({"Walking", "Main"},
                   Button("# EMERGENCY STOP",
@@ -252,6 +256,30 @@ void Controller::addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui)
                               }),
                   NumberInput("Final DSP duration [s]", [this]() { return plan.finalDSPDuration(); },
                               [this](double duration) { plan.finalDSPDuration(duration); }));
+  gui->addElement(
+      {"Walking", "Sole"},
+      mc_rtc::gui::Label("Ankle offset",
+                         []() {
+                           return std::string{
+                               "position of ankle w.r.t to left foot center. The corresponding offset for the right "
+                               "foot is computed assuming that the feet are symetrical in the lateral direction"};
+                         }),
+      mc_rtc::gui::ArrayInput("Left Ankle Offset",
+                              [this]() -> const Eigen::Vector2d & { return sole_.leftAnkleOffset; },
+                              [this](const Eigen::Vector2d & offset) {
+                                sole_.leftAnkleOffset = offset;
+                                mpc_.sole(sole_);
+                              }),
+      mc_rtc::gui::ArrayLabel("Right Ankle Offset",
+                              [this]() -> Eigen::Vector2d {
+                                return {sole_.leftAnkleOffset.x(), -sole_.leftAnkleOffset.y()};
+                              }),
+      mc_rtc::gui::ArrayLabel("Sole half width/length",
+                              [this]() {
+                                return Eigen::Vector2d{sole_.halfWidth, sole_.halfLength};
+                              })
+
+  );
 }
 
 void Controller::reset(const mc_control::ControllerResetData & data)
@@ -268,7 +296,8 @@ void Controller::reset(const mc_control::ControllerResetData & data)
 }
 
 void Controller::setContacts(
-    const std::vector<std::pair<mc_tasks::lipm_stabilizer::ContactState, sva::PTransformd>> & contacts, bool fullDoF)
+    const std::vector<std::pair<mc_tasks::lipm_stabilizer::ContactState, sva::PTransformd>> & contacts,
+    bool fullDoF)
 {
   stabilizer()->setContacts(contacts);
   auto rName = robot().name();
