@@ -101,9 +101,17 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   // - Default configuration from the robot module
   // - Additional configuration from the configuration, in section robot_models/robot_name/stabilizer
   // ====================
-  stabilizer_.reset(new mc_tasks::lipm_stabilizer::StabilizerTask(
-      solver().robots(), solver().realRobots(), robot().robotIndex(), stabiConfig.leftFootSurface,
-      stabiConfig.rightFootSurface, stabiConfig.torsoBodyName, solver().dt()));
+  // clang-format off
+  stabilizer_.reset(
+    new mc_tasks::lipm_stabilizer::StabilizerTask(
+      solver().robots(),
+      solver().realRobots(),
+      robot().robotIndex(),
+      stabiConfig.leftFootSurface,
+      stabiConfig.rightFootSurface,
+      stabiConfig.torsoBodyName,
+      solver().dt()));
+  // clang-format on
   stabilizer_->configure(stabiConfig);
 
   // Read footstep plans from configuration

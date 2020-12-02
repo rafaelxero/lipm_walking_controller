@@ -990,8 +990,10 @@ transitions:
 # Set realRobot's joint configuration from encoder readings
 ObserverPipelines:
   name: "CoMObservation"
+  gui: true
   observers:
     - type: Encoder
+    - type: Attitude
     - type: KinematicInertial
     - type: BodySensor
       update: false
