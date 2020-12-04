@@ -133,10 +133,17 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   // =========================
   // Create Swing foot tasks
   // =========================
+  double swingWeight = 1000;
+  double swingStiffness = 500;
+  if(robotConfig.has("swingfoot"))
+  {
+    robotConfig("swingfoot")("weight", swingWeight);
+    robotConfig("swingfoot")("stiffness", swingStiffness);
+  }
   swingFootTaskRight_.reset(
-      new mc_tasks::SurfaceTransformTask("RightFootCenter", robots(), robots().robotIndex(), 2000, 500));
+      new mc_tasks::SurfaceTransformTask("RightFootCenter", robots(), robots().robotIndex(), swingWeight, swingStiffness));
   swingFootTaskLeft_.reset(
-      new mc_tasks::SurfaceTransformTask("LeftFootCenter", robots(), robots().robotIndex(), 2000, 500));
+      new mc_tasks::SurfaceTransformTask("LeftFootCenter", robots(), robots().robotIndex(), swingWeight, swingStiffness));
 
   addLogEntries(logger());
   mpc_.addLogEntries(logger());
