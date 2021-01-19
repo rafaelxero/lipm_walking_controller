@@ -32,17 +32,17 @@ set(CONTROLLER_SRC
     SwingFoot.cpp)
 
 set(CONTROLLER_HDR
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/Contact.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/Controller.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/FootstepPlan.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/ModelPredictiveControl.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/PlanInterpolator.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/Preview.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/Sole.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/State.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/SwingFoot.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/utils/polynomials.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/lipm_walking/utils/slerp.h)
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/Contact.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/Controller.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/FootstepPlan.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/ModelPredictiveControl.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/PlanInterpolator.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/Preview.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/Sole.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/State.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/SwingFoot.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/utils/polynomials.h
+    ${CMAKE_SOURCE_DIR}/include/lipm_walking/utils/slerp.h)
 
 add_library(${PROJECT_NAME} SHARED ${CONTROLLER_SRC} ${CONTROLLER_HDR})
 target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include> $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
@@ -58,3 +58,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/../etc/LIPMWalking.in.yaml" "${CMAKE
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/etc/LIPMWalking.yaml" DESTINATION "${MC_RTC_LIBDIR}/mc_controller/etc/")
 
 add_subdirectory(states)
+
+install(TARGETS ${PROJECT_NAME}
+  EXPORT "${TARGETS_EXPORT_NAME}"
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
+install(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/include/ DESTINATION include)
+
