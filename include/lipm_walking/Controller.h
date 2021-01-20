@@ -32,8 +32,8 @@
 #include <mc_control/mc_controller.h>
 #include <mc_planning/Pendulum.h>
 #include <mc_rtc/logging.h>
-#include <mc_tasks/lipm_stabilizer/StabilizerTask.h>
 #include <mc_tasks/SurfaceTransformTask.h>
+#include <mc_tasks/lipm_stabilizer/StabilizerTask.h>
 
 #include <lipm_walking/Contact.h>
 #include <lipm_walking/FootstepPlan.h>
@@ -97,15 +97,6 @@ struct MC_CONTROL_DLLAPI Controller : public mc_control::fsm::Controller
    *
    */
   void addLogEntries(mc_rtc::Logger & logger);
-
-  /** Reset robot to its initial (half-sitting) configuration.
-   *
-   * The reason why I do it inside the controller rather than via the current
-   * mc_rtc way (switching to half_sitting controller then back to this one)
-   * is <https://gite.lirmm.fr/multi-contact/mc_rtc/issues/54>.
-   *
-   */
-  void internalReset();
 
   /** Set fraction of total weight that should be sustained by the left foot.
    *
@@ -316,6 +307,7 @@ public: /* visible to FSM states */
   std::shared_ptr<mc_tasks::SurfaceTransformTask> swingFootTaskLeft_;
   std::shared_ptr<mc_tasks::SurfaceTransformTask> swingFootTaskRight_;
   bool isWalking = false;
+  unsigned nbMPCFailures_ = 0; /**< Number of times the walking pattern generator failed */
 
 private: /* hidden from FSM states */
   std::shared_ptr<mc_tasks::lipm_stabilizer::StabilizerTask> stabilizer_;
@@ -326,13 +318,11 @@ private: /* hidden from FSM states */
   mc_planning::Pendulum
       pendulum_; /**< Holds the reference state (CoM position, velocity, ZMP, ...) from the walking pattern */
   Sole sole_; /**< Sole dimensions of the robot model */
-  bool leftFootRatioJumped_ = false; /**< Flag used to avoid discontinuous CoM velocity updates */
   double ctlTime_ = 0.; /**< Controller time */
   double doubleSupportDurationOverride_ = -1.; // [s]
   double leftFootRatio_ = 0.5; /**< Weight distribution ratio (0: all weight on right foot, 1: all on left foot) */
   std::string segmentName_ = ""; /**< Name of current log segment (this is an mc_rtc specific) */
   unsigned nbLogSegments_ = 100; /**< Index used to number log segments (this is an mc_rtc specific) */
-  unsigned nbMPCFailures_ = 0; /**< Number of times the walking pattern generator failed */
 };
 
 } // namespace lipm_walking
