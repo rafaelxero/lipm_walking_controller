@@ -32,7 +32,7 @@ robot_models:
         contact:
           damping: 300.
       dcm_bias:
-        biasDriftPerSeconStd: 0.0001
+        biasDriftPerSecondStd: 0.0001
         withDCMBias: true
     sole:
       half_length: 0.108
