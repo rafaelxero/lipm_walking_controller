@@ -32,8 +32,8 @@
 #include <mc_control/mc_controller.h>
 #include <mc_planning/Pendulum.h>
 #include <mc_rtc/logging.h>
-#include <mc_tasks/lipm_stabilizer/StabilizerTask.h>
 #include <mc_tasks/SurfaceTransformTask.h>
+#include <mc_tasks/lipm_stabilizer/StabilizerTask.h>
 
 #include <lipm_walking/Contact.h>
 #include <lipm_walking/FootstepPlan.h>

@@ -45,17 +45,17 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   auto planConfig = config("plans")(controlRobot().name());
 
   mc_rtc::log::info("Loading default stabilizer configuration");
-  auto stabiConfig = robot().module().defaultLIPMStabilizerConfiguration();
+  defaultStabilizerConfig_ = robot().module().defaultLIPMStabilizerConfiguration();
   if(robotConfig.has("stabilizer"))
   {
     mc_rtc::log::info("Loading additional stabilizer configuration:\n{}", robotConfig("stabilizer").dump(true));
-    stabiConfig.load(robotConfig("stabilizer"));
-    mc_rtc::log::info("Stabi prop {}", stabiConfig.dcmPropGain);
+    defaultStabilizerConfig_.load(robotConfig("stabilizer"));
+    mc_rtc::log::info("Stabi prop {}", defaultStabilizerConfig_.dcmPropGain);
   }
 
   // Patch CoM height and step width in all plans
   std::vector<std::string> plans = planConfig.keys();
-  double comHeight = stabiConfig.comHeight;
+  double comHeight = defaultStabilizerConfig_.comHeight;
   for(const auto & p : plans)
   {
     auto plan = planConfig(p);
@@ -116,12 +116,12 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
       solver().robots(),
       solver().realRobots(),
       robot().robotIndex(),
-      stabiConfig.leftFootSurface,
-      stabiConfig.rightFootSurface,
-      stabiConfig.torsoBodyName,
+      defaultStabilizerConfig_.leftFootSurface,
+      defaultStabilizerConfig_.rightFootSurface,
+      defaultStabilizerConfig_.torsoBodyName,
       solver().dt()));
   // clang-format on
-  stabilizer_->configure(stabiConfig);
+  stabilizer_->configure(defaultStabilizerConfig_);
 
   // Read footstep plans from configuration
   planInterpolator.configure(planConfig);
@@ -140,10 +140,10 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
     robotConfig("swingfoot")("weight", swingWeight);
     robotConfig("swingfoot")("stiffness", swingStiffness);
   }
-  swingFootTaskRight_.reset(
-      new mc_tasks::SurfaceTransformTask("RightFootCenter", robots(), robots().robotIndex(), swingWeight, swingStiffness));
-  swingFootTaskLeft_.reset(
-      new mc_tasks::SurfaceTransformTask("LeftFootCenter", robots(), robots().robotIndex(), swingWeight, swingStiffness));
+  swingFootTaskRight_.reset(new mc_tasks::SurfaceTransformTask("RightFootCenter", robots(), robots().robotIndex(),
+                                                               swingWeight, swingStiffness));
+  swingFootTaskLeft_.reset(new mc_tasks::SurfaceTransformTask("LeftFootCenter", robots(), robots().robotIndex(),
+                                                              swingWeight, swingStiffness));
 
   addLogEntries(logger());
   mpc_.addLogEntries(logger());
