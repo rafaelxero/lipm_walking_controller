@@ -332,6 +332,8 @@ private: /* hidden from FSM states */
   std::string segmentName_ = ""; /**< Name of current log segment (this is an mc_rtc specific) */
   unsigned nbLogSegments_ = 100; /**< Index used to number log segments (this is an mc_rtc specific) */
   unsigned nbMPCFailures_ = 0; /**< Number of times the walking pattern generator failed */
+  std::string observerPipelineName_ = "LIPMWalkingObserverPipeline"; /**< Name of the observer pipeline used for
+                                                                        updating the real robot for CoM estimation */
 };
 
 } // namespace lipm_walking

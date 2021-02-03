@@ -1112,11 +1112,12 @@ transitions:
 
 # Set realRobot's joint configuration from encoder readings
 ObserverPipelines:
-  name: "CoMObservation"
+  name: "LIPMWalkingObserverPipeline"
   gui: true
   observers:
     - type: Encoder
     - type: Attitude
+      required: false
     - type: KinematicInertial
       config:
         anchorFrame:

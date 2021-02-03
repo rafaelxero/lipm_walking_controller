@@ -50,7 +50,7 @@ Controller::Controller(std::shared_ptr<mc_rbdyn::RobotModule> robotModule,
   {
     mc_rtc::log::info("Loading additional stabilizer configuration:\n{}", robotConfig("stabilizer").dump(true));
     defaultStabilizerConfig_.load(robotConfig("stabilizer"));
-    mc_rtc::log::info("Stabi prop {}", defaultStabilizerConfig_.dcmPropGain);
+    mc_rtc::log::info("Stabilizer Configuration:\n{}", defaultStabilizerConfig_.save().dump(true));
   }
 
   // Patch CoM height and step width in all plans
@@ -300,6 +300,13 @@ void Controller::addGUIElements(std::shared_ptr<mc_rtc::gui::StateBuilder> gui)
 
 void Controller::reset(const mc_control::ControllerResetData & data)
 {
+  config()("observerPipelineName", observerPipelineName_);
+  if(!hasObserverPipeline(observerPipelineName_))
+  {
+    mc_rtc::log::error_and_throw<std::runtime_error>("LIPMWalking requires an observer pipeline named \"{}\"",
+                                                     observerPipelineName_);
+  }
+
   mc_control::fsm::Controller::reset(data);
 
   stabilizer_->reset();
@@ -386,6 +393,20 @@ void Controller::leftFootRatio(double ratio)
 
 bool Controller::run()
 {
+  const auto & observerp = observerPipeline(observerPipelineName_);
+  if(!observerp.success())
+  {
+    mc_rtc::log::error("Required pipeline \"{}\" for real robot observation failed to run!", observerPipelineName_);
+    for(const auto & observer : observerp.observers())
+    {
+      if(!observer.success())
+      {
+        mc_rtc::log::error("Observer \"{}\" failed with error \"{}\"", observer.observer().name(),
+                           observer.observer().error());
+      }
+    }
+    return false;
+  }
   if(emergencyStop)
   {
     return false;
