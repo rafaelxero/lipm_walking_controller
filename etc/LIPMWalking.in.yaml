@@ -371,7 +371,7 @@ plans:
         - pose:
             translation: [0.035, 0.09, 0.0]
           surface: LeftFootCenter
-  hrp4j: &hrp4j
+  hrp4j:
     ashibumi: # stepping in place
       double_support_duration: 0.5
       single_support_duration: 0.8
@@ -476,7 +476,16 @@ plans:
         - pose:
             translation: [0.035, 0.07, 0.0]
           surface: LeftFootCenter
-  hrp4cr: *hrp4j
+  hrp4cr:
+    base: hrp4j
+    warmup:
+      com_height: 0.78
+    ashibumi:
+      com_height: 0.78
+    custom_forward:
+      com_height: 0.78
+    custom_backward:
+      com_height: 0.78
   hrp2_drc:
     ashibumi: # stepping in place
       double_support_duration: 0.2
